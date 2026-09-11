@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airbus Checklisten — Flight Sim &amp; COFFEE</title>
+<meta name="description" content="Specs, Limits und Checklisten für die Airbus-Flotte in der privaten Flugsimulation.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+
+<style>
+  /* ---------- Page header ---------- */
+  .page-hero{
+    background: var(--ink);
+    color: #fff;
+    padding-block: clamp(2.5rem, 6vw, 4rem) clamp(2rem, 5vw, 3rem);
+  }
+
+  .breadcrumb{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #9d9688;
+    margin-bottom: 1.2rem;
+  }
+
+  .breadcrumb a{
+    color: #c9c1b1;
+    text-decoration: none;
+  }
+  .breadcrumb a:hover{ color: var(--brass-light); }
+
+  .page-hero h1{
+    color: #fff;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+  }
+
+  .page-hero p{
+    margin-top: 0.9rem;
+    color: #c9c1b1;
+    max-width: 62ch;
+    font-size: clamp(0.98rem, 1.3vw, 1.08rem);
+  }
+
+  /* ---------- Aircraft picker ---------- */
+  .picker{
+    padding-block: clamp(2rem, 4vw, 2.6rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .picker-label{
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 1rem;
+  }
+
+  .tabs{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .tab{
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 1rem 0.55rem 0.6rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    font-family: var(--font-body);
+    text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .tab:hover{ border-color: var(--brass); }
+
+  .tab img{
+    height: 30px;
+    width: 30px;
+    object-fit: contain;
+    filter: grayscale(1);
+    opacity: 0.5;
+    transition: filter 0.2s ease, opacity 0.2s ease;
+  }
+
+  .tab strong{
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+
+  .tab small{
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+  }
+
+  .tab.active{
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .tab.active img{
+    filter: none;
+    opacity: 1;
+  }
+
+  .tab.active strong{ color: #fff; }
+  .tab.active small{ color: var(--brass-light); }
+
+  /* ---------- Spec panel ---------- */
+  .panel{
+    display: none;
+  }
+
+  .panel.active{
+    display: block;
+  }
+
+  .panel-grid{
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--gap);
+    align-items: start;
+  }
+
+  .spec-group{
+    margin-bottom: 2rem;
+  }
+
+  .spec-group:last-child{ margin-bottom: 0; }
+
+  .spec-title{
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--brass-dark);
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .spec-row{
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.55rem;
+    border-bottom: 1px solid rgba(172,138,108,0.16);
+    font-size: 0.95rem;
+  }
+
+  .spec-row:last-child{ border-bottom: none; }
+
+  .spec-row dt{
+    color: var(--text-soft);
+  }
+
+  .spec-row dd{
+    margin: 0;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .panel-media{
+    position: relative;
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .panel-media img{
+    width: 100%;
+    display: block;
+  }
+
+  .panel-media figcaption{
+    padding: 0.9rem 1.1rem;
+    font-size: 0.82rem;
+    color: var(--text-soft);
+    border-top: 1px solid var(--line);
+  }
+
+  .panel-media figcaption strong{
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    color: var(--brass-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .panel-media figcaption p{
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .panel-media figcaption p + p{
+    margin-top: 0.8rem;
+  }
+
+  .panel-media::before, .panel-media::after{
+  content: "";
+  position: absolute;
+  width: 22px; height: 22px;
+  border: 2px solid var(--brass);
+  z-index: 2;
+}
+.panel-media::before{ top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.panel-media::after{ bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  .panel .copy h3{
+    font-size: 1.25rem;
+    margin-top: 2.2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .panel-foot{
+    margin-top: 1.4rem;
+    padding-top: 1.6rem;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px){
+    .panel-grid{ grid-template-columns: 1fr; }
+    .panel-media{ order: -1; }
+  }
+
+  @media (max-width: 560px){
+    .tab{ flex: 1 1 calc(50% - 0.6rem); }
+    .spec-row{ font-size: 0.9rem; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html">
+      <img src="../Logo_raw_new.png" alt="">
+      <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+    </a>
+
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Menü öffnen">
+      <span></span><span></span><span></span>
+    </label>
+
+    <ul class="nav-links">
+      <li><a href="index.html#checklisten" aria-current="page">Checklisten</a></li>
+      <li><a href="index.html#prozeduren">Prozeduren</a></li>
+      <li><a href="index.html#flugzeugtypen">Flugzeugtypen</a></li>
+      <li><a href="index.html#operations">Operations</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-hero">
+  <div class="wrap">
+    <p class="breadcrumb">
+      <a href="index.html">Start</a> <span>／</span> <a href="index.html#checklisten">Checklisten</a> <span>／</span> Airbus
+    </p>
+    <h1>Airbus — Specs, Limits &amp; Checklisten</h1>
+    <p>Kennzahlen und Checklisten für die Airbus-Flotte, vereinfacht und aufbereitet für die
+       private Flugsimulation. Werte dienen als schnelle Gedächtnisstütze und ersetzen keine
+       offiziellen Herstellerunterlagen.</p>
+  </div>
+</header>
+
+<!-- AIRCRAFT PICKER -->
+<div class="picker">
+  <div class="wrap">
+    <p class="picker-label">Flugzeugtyp wählen</p>
+    <div class="tabs" role="tablist" aria-label="Airbus Flugzeugtyp">
+      <button class="tab active" type="button" role="tab" aria-selected="true" data-target="A400M">
+        <img src="../Icon_A400M.png" alt="">
+        <span><strong>A400M</strong><small>Militärtransporter</small></span>
+      </button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-target="A220">
+        <img src="../Icon_A220.png" alt="">
+        <span><strong>A220</strong><small>Regional</small></span>
+      </button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-target="A320">
+        <img src="../Icon_A320.png" alt="">
+        <span><strong>A320 CEO</strong><small>Kurz-/Mittelstrecke</small></span>
+      </button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-target="A330">
+        <img src="../Icon_A330.png" alt="">
+        <span><strong>A330 CEO</strong><small>Langstrecke</small></span>
+      </button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-target="A340">
+        <img src="../Icon_A340.png" alt="">
+        <span><strong>A340</strong><small>Langstrecke</small></span>
+      </button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-target="A350">
+        <img src="../Icon_A350.png" alt="">
+        <span><strong>A350</strong><small>Langstrecke</small></span>
+      </button>
+      <button class="tab" type="button" role="tab" aria-selected="false" data-target="A380">
+        <img src="../Icon_A380.png" alt="">
+        <span><strong>A380</strong><small>Großraum</small></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SPEC PANELS -->
+<section class="section">
+  <div class="wrap">
+
+    <!-- A400M -->
+    <div class="panel active" id="panel-A400M" role="tabpanel">
+      <div class="panel-grid">
+        <div class="copy">
+          <p class="eyebrow">Airbus A400M</p>
+          
+          <h3>Checklisten</h3>
+          <div class="panel-foot">
+            <a class="btn btn-primary" href="AB_Checklist_A400M.html">Vollständige Checkliste ansehen →</a>
+          </div>
+
+          <h3>Specifications &amp; Limitations</h3>
+
+          <div class="spec-group">
+            <p class="spec-title">Weights</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Take-Off Weight</dt><dd>141 t / 310.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Landing Weight</dt><dd>121 t / 267.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Cargo Weight</dt><dd>37 t / 81.600 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Cargo Weight Long-Range</dt><dd>20 t / 44.000 lbs</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Range</p>
+            <dl>
+              <div class="spec-row"><dt>Normal Operating Range</dt><dd>4.500 km / 2.400 NM</dd></div>
+              <div class="spec-row"><dt>Max. Cargo-Range</dt><dd>3.300 km / 1.800 NM</dd></div>
+              <div class="spec-row"><dt>Max. Long-Range</dt><dd>8.700 km / 4.700 NM</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Altitude</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Cruise Level</dt><dd>FL 350</dd></div>
+              <div class="spec-row"><dt>Max. Flight Level</dt><dd>FL 400</dd></div>
+            </dl>
+          </div>
+
+
+        </div>
+
+        <figure class="panel-media">
+          <img src="../A400M_img.jpg" alt="Airbus A400M">
+          <figcaption>
+            <strong>AIRBUS A400M</strong>
+            <p>Der Airbus A400M Atlas ist ein vierstrahliges Turboprop-Militärtransportflugzeug, das
+               strategische (hohe Reichweite/Nutzlast) und taktische Transportfähigkeiten (Landung auf
+               unbefestigten Pisten) vereint. Der A400M wurde am 1. August 2013 offiziell in Dienst
+               gestellt. Das erste Serienflugzeug wurde an die französische Luftwaffe (Armée de l’air)
+               übergeben.</p>
+            <p>Bei der deutschen Luftwaffe ging die erste Maschine knapp anderthalb Jahre später, am
+               19. Dezember 2014, in Dienst.</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- A220 -->
+    <div class="panel" id="panel-A220" role="tabpanel">
+      <div class="panel-grid">
+        <div class="copy">
+          <p class="eyebrow">Airbus A220</p>
+          <h3>Checklisten</h3>
+          <div class="panel-foot">
+            <a class="btn btn-primary" href="AB_Checklist_A220.html">Vollständige Checkliste ansehen →</a>
+          </div>
+
+          <h3>Specifications &amp; Limitations</h3>
+
+          <div class="spec-group">
+            <p class="spec-title">Weights</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Take-Off Weight</dt><dd>63,7 t / 140.500 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Landing Weight</dt><dd>54,7 t / 120.500 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Zero Fuel Weight</dt><dd>52,6 t / 116.000 lbs</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Pax</p>
+            <dl>
+              <div class="spec-row"><dt>Number of seats</dt><dd>100 – 160</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Range</p>
+            <dl>
+              <div class="spec-row"><dt>A220-100 Range</dt><dd>6.600 km / 3.600 NM</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Altitude</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Flight Level</dt><dd>FL 410</dd></div>
+            </dl>
+          </div>
+
+        </div>
+
+        <figure class="panel-media">
+          <img src="../A220_img.jpg" alt="Airbus A220">
+          <figcaption>
+            <strong>AIRBUS A220</strong>
+            <p>Der Airbus A220 (ursprünglich von Bombardier als CSeries entwickelt) ist ein modernes,
+               zweistrahliges Schmalrumpfflugzeug für Kurz- und Mittelstrecken im Marktsegment von
+               100 bis 160 Sitzplätzen.</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- A320 -->
+    <div class="panel" id="panel-A320" role="tabpanel">
+      <div class="panel-grid">
+        <div class="copy">
+          <p class="eyebrow">Airbus A320 (CEO)</p>
+          <h2>Specifications &amp; Limitations</h2>
+
+          <div class="spec-group">
+            <p class="spec-title">Weights</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Take-Off Weight</dt><dd>77,4 t / 170.600 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Landing Weight</dt><dd>64,5 t / 142.200 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Zero Fuel Weight</dt><dd>61,0 t / 134.500 lbs</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Range</p>
+            <dl>
+              <div class="spec-row"><dt>A319 Range</dt><dd>3.300 km / 1.800 NM</dd></div>
+              <div class="spec-row"><dt>A320 Range</dt><dd>5.000 km / 2.700 NM</dd></div>
+              <div class="spec-row"><dt>A321 Range</dt><dd>6.100 km / 3.300 NM</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Pax</p>
+            <dl>
+              <div class="spec-row"><dt>A319 / A320 / A321 Number of seats</dt><dd>120–140 / 150–186 / 184–244</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Altitude</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Cruise Level</dt><dd>FL 390</dd></div>
+              <div class="spec-row"><dt>Max. Flight Level</dt><dd>FL 400</dd></div>
+            </dl>
+          </div>
+
+          <div class="panel-foot">
+            <span class="chip soon">Checkliste A320 <span class="badge">bald verfügbar</span></span>
+          </div>
+        </div>
+
+        <figure class="panel-media">
+          <img src="../A320_img.jpg" alt="Airbus A320">
+          <figcaption>
+            <strong>AIRBUS A320</strong>
+            <p>Der Airbus A320 ist das weltweit erfolgreichste zweistrahlige Schmalrumpfflugzeug für
+               Kurz- und Mittelstrecken und bildet das Rückgrat moderner Passagierflotten. Bei seiner
+               Indienststellung im Jahr 1988 setzte er Maßstäbe als erstes ziviles Verkehrsflugzeug mit
+               digitaler Fly-by-Wire-Steuerung, bei der die Piloten das Flugzeug über Side-Sticks statt
+               über ein klassisches Steuerhorn bedienen.</p>
+            <p>In der Standardkonfiguration bietet das Basismodell Platz für etwa 150 bis 180 Passagiere
+               in einer klassischen Bestuhlung mit drei Sitzen auf jeder Seite des Mittelgangs. Neben der
+               Standardversion gehört zur A320-Familie auch der verkürzte A319 für rund 120 bis 140
+               Passagiere sowie der gestreckte A321, der je nach Kabinenaufteilung bis zu 244 Passagiere
+               befördern kann.</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- A330 -->
+    <div class="panel" id="panel-A330" role="tabpanel">
+      <div class="panel-grid">
+        <div class="copy">
+          <p class="eyebrow">Airbus A330 (CEO)</p>
+          <h2>Specifications &amp; Limitations</h2>
+
+          <div class="spec-group">
+            <p class="spec-title">Weights</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Take-Off Weight</dt><dd>230 t / 507.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Landing Weight</dt><dd>185 t / 408.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Zero Fuel Weight</dt><dd>173 t / 381.000 lbs</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Range</p>
+            <dl>
+              <div class="spec-row"><dt>A330-200 CEO Range</dt><dd>12.500 km / 6.749 NM</dd></div>
+              <div class="spec-row"><dt>A330-300 CEO Range</dt><dd>10.500 km / 5.669 NM</dd></div>
+              <div class="spec-row"><dt>A330-200F CEO Range</dt><dd>7.400 km / 4.000 NM</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Altitude</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Cruise Level</dt><dd>FL 350 – 400</dd></div>
+              <div class="spec-row"><dt>Max. Flight Level</dt><dd>FL 410</dd></div>
+            </dl>
+          </div>
+
+          <div class="panel-foot">
+            <span class="chip soon">Checkliste A330 <span class="badge">bald verfügbar</span></span>
+          </div>
+        </div>
+
+        <figure class="panel-media">
+          <img src="../A330_img.jpg" alt="Airbus A330">
+          <figcaption>
+            <strong>AIRBUS A330</strong>
+            <p>Der Airbus A330 ist ein weltweit sehr erfolgreiches zweistrahliges Großraumflugzeug für
+               Mittel- und Langstrecken und bildet eine verlässliche Säule vieler internationaler
+               Fluggesellschaften. Bei seiner ersten Indienststellung im Jahr 1994 setzte er Maßstäbe,
+               indem er die fortschrittliche Fly-by-Wire-Technologie der A320-Familie erstmals in ein
+               Großraumflugzeug integrierte und so den Weg für hochmoderne Langstreckenjets ebnete.</p>
+            <p>In der typischen Kabinenaufteilung bietet der Großraumjet Platz für etwa 250 bis 300
+               Passagiere in einer typischen Mehrklassen-Konfiguration mit zwei Mittelgängen und einer
+               komfortablen Bestuhlung. Die Modellfamilie umfasst den etwas kürzeren A330-200 mit
+               besonders hoher Reichweite sowie den gestreckten A330-300, der je nach Dichte der
+               Bestuhlung bis zu 440 Passagiere befördern kann.</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- A340 -->
+    <div class="panel" id="panel-A340" role="tabpanel">
+      <div class="panel-grid">
+        <div class="copy">
+          <p class="eyebrow">Airbus A340</p>
+          <h2>Specifications &amp; Limitations</h2>
+
+          <div class="spec-group">
+            <p class="spec-title">Weights</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Take-Off Weight</dt><dd>230 t / 507.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Landing Weight</dt><dd>185 t / 408.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Zero Fuel Weight</dt><dd>173 t / 381.000 lbs</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Range</p>
+            <dl>
+              <div class="spec-row"><dt>A340-300 Range</dt><dd>12.500 km / 6.749 NM</dd></div>
+              <div class="spec-row"><dt>A340-600 Range</dt><dd>10.500 km / 5.669 NM</dd></div>
+              <div class="spec-row"><dt>—</dt><dd>7.400 km / 4.000 NM</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Altitude</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Cruise Level</dt><dd>FL 350 – 400</dd></div>
+              <div class="spec-row"><dt>Max. Flight Level</dt><dd>FL 410</dd></div>
+            </dl>
+          </div>
+
+          <div class="panel-foot">
+            <span class="chip soon">Checkliste A340 <span class="badge">bald verfügbar</span></span>
+          </div>
+        </div>
+
+        <figure class="panel-media">
+          <img src="../A340_img.jpg" alt="Airbus A340">
+          <figcaption>Reichweite bei normaler Betriebsauslastung</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- A350 -->
+    <div class="panel" id="panel-A350" role="tabpanel">
+      <div class="panel-grid">
+        <div class="copy">
+          <p class="eyebrow">Airbus A350</p>
+          <h2>Specifications &amp; Limitations</h2>
+
+          <div class="spec-group">
+            <p class="spec-title">Weights</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Take-Off Weight</dt><dd>230 t / 507.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Landing Weight</dt><dd>185 t / 408.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Zero Fuel Weight</dt><dd>173 t / 381.000 lbs</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Range</p>
+            <dl>
+              <div class="spec-row"><dt>A340-300 Range</dt><dd>12.500 km / 6.749 NM</dd></div>
+              <div class="spec-row"><dt>A340-600 Range</dt><dd>10.500 km / 5.669 NM</dd></div>
+              <div class="spec-row"><dt>—</dt><dd>7.400 km / 4.000 NM</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Altitude</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Cruise Level</dt><dd>FL 350 – 400</dd></div>
+              <div class="spec-row"><dt>Max. Flight Level</dt><dd>FL 410</dd></div>
+            </dl>
+          </div>
+
+          <div class="panel-foot">
+            <span class="chip soon">Checkliste A350 <span class="badge">bald verfügbar</span></span>
+          </div>
+        </div>
+
+        <figure class="panel-media">
+          <img src="../A350_img.jpg" alt="Airbus A350">
+          <figcaption>Reichweite bei normaler Betriebsauslastung</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- A380 -->
+    <div class="panel" id="panel-A380" role="tabpanel">
+      <div class="panel-grid">
+        <div class="copy">
+          <p class="eyebrow">Airbus A380</p>
+          <h2>Specifications &amp; Limitations</h2>
+
+          <div class="spec-group">
+            <p class="spec-title">Weights</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Take-Off Weight</dt><dd>230 t / 507.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Landing Weight</dt><dd>185 t / 408.000 lbs</dd></div>
+              <div class="spec-row"><dt>Max. Zero Fuel Weight</dt><dd>173 t / 381.000 lbs</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Range</p>
+            <dl>
+              <div class="spec-row"><dt>A340-300 Range</dt><dd>12.500 km / 6.749 NM</dd></div>
+              <div class="spec-row"><dt>A340-600 Range</dt><dd>10.500 km / 5.669 NM</dd></div>
+              <div class="spec-row"><dt>—</dt><dd>7.400 km / 4.000 NM</dd></div>
+            </dl>
+          </div>
+
+          <div class="spec-group">
+            <p class="spec-title">Altitude</p>
+            <dl>
+              <div class="spec-row"><dt>Max. Cruise Level</dt><dd>FL 350 – 400</dd></div>
+              <div class="spec-row"><dt>Max. Flight Level</dt><dd>FL 410</dd></div>
+            </dl>
+          </div>
+
+          <div class="panel-foot">
+            <span class="chip soon">Checkliste A380 <span class="badge">bald verfügbar</span></span>
+          </div>
+        </div>
+
+        <figure class="panel-media">
+          <img src="../A380_img.jpg" alt="Airbus A380">
+          <figcaption>Reichweite bei normaler Betriebsauslastung</figcaption>
+        </figure>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <a class="brand" href="index.html">
+        <img src="../Logo_raw_new.png" alt="">
+        <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+      </a>
+      <p class="foot-note">Alle Inhalte sind vereinfacht und ausschließlich für die private
+         Flugsimulation aufbereitet. Kein Bezug zu realen Betriebsverfahren oder offiziellen
+         Herstellerunterlagen.</p>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Flight Sim &amp; COFFEE</span>
+      <span>Nur für private Nutzung</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+
+    tabs.forEach(function(tab){
+      tab.addEventListener('click', function(){
+        const target = tab.getAttribute('data-target');
+
+        tabs.forEach(function(t){
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        panels.forEach(function(p){ p.classList.remove('active'); });
+        document.getElementById('panel-' + target).classList.add('active');
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

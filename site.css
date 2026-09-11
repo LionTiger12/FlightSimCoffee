@@ -1,0 +1,672 @@
+/* ==========================================================
+   Flight Sim & Café — shared site styles
+   Used by index.html and all sub-pages (e.g. AB_Checklist.html)
+   ========================================================== */
+
+:root{
+  --ink:        #171b26;
+  --ink-2:      #232a3b;
+  --ink-3:      #313a52;
+  --paper:      #f7f3ec;
+  --paper-dim:  #ece5d7;
+  --text:       #241f19;
+  --text-soft:  #55503f;
+  --brass:      #ac8a6c;
+  --brass-dark: #8a6b4f;
+  --brass-light:#d6bd9e;
+  --amber:      #e0a536;
+  --line:       rgba(172,138,108,0.35);
+
+  --font-display: 'Space Grotesk', 'Arial Narrow', sans-serif;
+  --font-body: 'Inter', Arial, sans-serif;
+
+  --max: 1240px;
+  --gap: clamp(1.5rem, 3vw, 3rem);
+}
+
+*{ box-sizing: border-box; }
+
+html{ scroll-behavior: smooth; }
+
+body{
+  margin: 0;
+  background: var(--paper);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,h2,h3{
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+a{ color: inherit; }
+
+img{ max-width: 100%; display: block; }
+
+.wrap{
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+:focus-visible{
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+/* keeps anchor targets from hiding behind the sticky nav */
+*[id]{
+  scroll-margin-top: 84px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior: auto; }
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ---------- Nav ---------- */
+.nav{
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(23,27,38,0.86);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(214,189,158,0.25);
+}
+
+.nav-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.brand{
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+}
+
+.brand img{
+  height: 36px;
+  width: 36px;
+  border-radius: 50%;
+}
+
+.brand span{
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.brand span em{
+  font-style: normal;
+  color: var(--brass-light);
+}
+
+.nav-links{
+  display: flex;
+  gap: clamp(1rem, 2vw, 2.1rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a{
+  color: #e9e4da;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-links a[aria-current="page"]{
+  color: var(--brass-light);
+  border-color: var(--brass-light);
+}
+
+.nav-toggle{
+  display: none;
+}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn:hover{ transform: translateY(-2px); }
+
+.btn-primary{
+  background: var(--brass);
+  color: #1a1610;
+}
+.btn-primary:hover{ background: var(--brass-light); }
+
+.btn-ghost{
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+}
+.btn-ghost:hover{ border-color: #fff; }
+
+/* ---------- Sections ---------- */
+.section{
+  padding-block: clamp(3.5rem, 7vw, 6rem);
+  border-bottom: 1px solid var(--line);
+}
+
+.section-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+  align-items: center;
+}
+
+.section-grid.reverse .media{ order: 1; }
+.section-grid.reverse .copy{ order: 2; }
+
+.eyebrow{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--brass-dark);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.eyebrow::before{
+  content: "";
+  width: 26px; height: 1px;
+  background: var(--brass);
+}
+
+.copy h2{
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+  margin-bottom: 1rem;
+}
+
+.copy p{
+  color: var(--text-soft);
+  max-width: 52ch;
+}
+
+.media{
+  position: relative;
+  border: 1px solid var(--line);
+}
+
+.media::before, .media::after{
+  content: "";
+  position: absolute;
+  width: 22px; height: 22px;
+  border: 2px solid var(--brass);
+  z-index: 2;
+}
+.media::before{ top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.media::after{ bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+.media img{
+  width: 100%;
+  height: clamp(220px, 32vw, 360px);
+  object-fit: cover;
+}
+
+/* link chips */
+.chiprow{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 1.6rem;
+}
+
+.chip{
+  padding: 0.7rem 1.1rem;
+  background: var(--ink);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  border-radius: 2px;
+  transition: background 0.2s ease;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.chip:hover{ background: var(--brass-dark); }
+
+.chip.soon{
+  background: transparent;
+  color: var(--text-soft);
+  border: 1px dashed var(--line);
+  cursor: not-allowed;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.chip.soon .badge{
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: none;
+  background: var(--paper-dim);
+  color: var(--brass-dark);
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+
+/* ---------- Checklist link list (used on aircraft spec pages) ---------- */
+.checklist-links{
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.6rem;
+}
+
+.checklist-link{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.1rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.checklist-link:hover{
+  border-color: var(--brass);
+  background: var(--paper-dim);
+}
+
+.checklist-link .cl-text{
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+
+.checklist-link .cl-num{
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--brass-dark);
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.checklist-link .cl-title{
+  display: block;
+}
+
+.checklist-link strong{
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.96rem;
+  color: var(--ink);
+}
+
+.checklist-link span.cl-desc{
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+}
+
+.checklist-link .arrow{
+  flex-shrink: 0;
+  color: var(--brass);
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+
+.checklist-link:hover .arrow{ transform: translateX(3px); }
+
+/* ---------- Checklist table-of-contents buttons ---------- */
+.cl-toc{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1.4rem;
+}
+
+.cl-toc-btn{
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  background: var(--ink);
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid var(--ink);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.cl-toc-btn:hover{
+  background: var(--brass-dark);
+  border-color: var(--brass-dark);
+  transform: translateY(-2px);
+}
+
+.cl-toc-btn .num{
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--brass-light);
+  letter-spacing: 0.04em;
+}
+
+.cl-toc-btn strong{
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+}
+
+.cl-toc-btn small{
+  color: #c9c1b1;
+  font-size: 0.78rem;
+}
+
+/* ---------- Small buttons (section toolbars) ---------- */
+.btn-sm{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--font-body);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.btn-sm:hover{ border-color: var(--brass); background: var(--paper-dim); }
+
+/* ---------- Procedure notes ---------- */
+.proc-back{
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 1.2rem 1.3rem;
+  margin-bottom: 1.8rem;
+  max-width: 720px;
+}
+
+.proc-back::before, .proc-back::after{
+  content: "";
+  position: absolute;
+  width: 22px; height: 22px;
+  border: 2px solid var(--brass);
+  z-index: 2;
+}
+.proc-back::before{ top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.proc-back::after{ bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+.proc-notes{
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 1.2rem 1.3rem;
+  margin-bottom: 1.8rem;
+  max-width: 720px;
+}
+
+.proc-notes .proc-label{
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--brass-dark);
+  margin: 0 0 0.5rem;
+}
+
+.proc-notes .proc-sub{
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 1rem 0 0.4rem;
+}
+
+.proc-notes .proc-sub:first-child{ margin-top: 0; }
+
+.proc-notes ul{
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.proc-notes ul ul{
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.proc-formula{
+  margin-top: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--paper-dim);
+  border-left: 3px solid var(--brass);
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  color: var(--ink);
+}
+
+/* ---------- Data tables (speed schedules etc.) ---------- */
+.proc-table-wrap{
+  max-width: 720px;
+  margin-bottom: 1.8rem;
+  overflow-x: auto;
+}
+
+.proc-table-title{
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--brass-dark);
+  margin-bottom: 0.6rem;
+}
+
+.proc-table{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 0.88rem;
+}
+
+.proc-table th, .proc-table td{
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(172,138,108,0.16);
+  white-space: nowrap;
+}
+
+.proc-table th{
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--brass-dark);
+  background: var(--paper-dim);
+}
+
+.proc-table tr:last-child td{ border-bottom: none; }
+
+/* ---------- Interactive checklist ---------- */
+.check-group-label{
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--brass-dark);
+  margin: 1.6rem 0 0.6rem;
+}
+
+.check-group-label:first-child{ margin-top: 0; }
+
+.check-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 720px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.check-row{
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-bottom: 1px solid rgba(172,138,108,0.18);
+  background: none;
+  font-family: var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.check-list li:last-child .check-row{ border-bottom: none; }
+
+.check-row:hover{ background: var(--paper-dim); }
+
+.check-row .box{
+  flex-shrink: 0;
+  width: 16px; height: 16px;
+  margin-top: 0.2rem;
+  border: 1.5px solid var(--brass);
+  position: relative;
+}
+
+.check-row.done .box{ background: var(--brass); }
+
+.check-row.done .box::after{
+  content: "";
+  position: absolute;
+  left: 3px; top: -1px;
+  width: 5px; height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.check-row .row-text{
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.94rem;
+}
+
+.check-row .row-item{ color: var(--text); }
+.check-row .row-state{ font-weight: 600; color: var(--ink); text-align: right; white-space: nowrap; }
+
+.check-row.done .row-item,
+.check-row.done .row-state{
+  color: var(--text-soft);
+  text-decoration: line-through;
+  text-decoration-color: rgba(85,80,63,0.4);
+}
+
+.section-toolbar{
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+  max-width: 720px;
+}
+
+/* ---------- Footer ---------- */
+footer{
+  background: var(--ink);
+  color: #b7b0a1;
+  padding-block: 3rem;
+}
+
+.foot-row{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+footer .brand span{ color: #fff; }
+
+.foot-note{
+  max-width: 46ch;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.foot-legal{
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.8rem;
+  color: #726c60;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* ---------- Responsive (shared) ---------- */
+@media (max-width: 900px){
+  .section-grid, .section-grid.reverse{
+    grid-template-columns: 1fr;
+  }
+  .section-grid .media, .section-grid.reverse .media,
+  .section-grid .copy, .section-grid.reverse .copy{
+    order: initial;
+  }
+}
+
+@media (max-width: 720px){
+  .nav-links{
+    position: fixed;
+    inset: 68px 0 auto 0;
+    background: var(--ink);
+    flex-direction: column;
+    padding: 1.2rem 1.5rem 1.6rem;
+    gap: 1rem;
+    transform: translateY(-130%);
+    transition: transform 0.25s ease;
+    border-bottom: 1px solid rgba(214,189,158,0.25);
+  }
+  .nav-toggle:checked ~ .nav-links{ transform: translateY(0); }
+
+  .nav-toggle-label{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .nav-toggle-label span{
+    display: block;
+    width: 22px; height: 2px; background: #fff;
+  }
+}
+
+@media (min-width: 721px){
+  .nav-toggle-label{ display: none; }
+}
