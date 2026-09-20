@@ -175,6 +175,17 @@
       margin-top: 2.5rem;
     }
   }
+
+  .watermark-logo {
+  position: absolute;
+  width: 65%;   /* Feste, kleine Größe für das Logo (alternativ z.B. 15%) */
+  height: 65%;
+  scale: 15%;
+  opacity: 0.50; /* Dezente Transparenz (Wert zwischen 0 und 1) */
+  bottom: -60px;     /* Abstand nach oben (kannst du anpassen, z. B. 15px oder 10px) */
+  right: -130px;    /* Abstand nach links (kannst du anpassen) */
+  pointer-events: none; /* Klicks gehen durch das Wasserzeichen hindurch */
+}
 </style>
 </head>
 
@@ -293,10 +304,16 @@
       <div class="chiprow">
         <a class="chip" href="AB_Checklist.html">Airbus</a>
         <a class="chip" href="BO_Checklist.html">Boeing</a>
+        <span class="chip soon">Embraer<span class="badge">bald verfügbar</span></span>
+        <span class="chip soon">Bombardier<span class="badge">bald verfügbar</span></span>
+        <span class="chip soon">Weitere Airliner<span class="badge">bald verfügbar</span></span>
       </div>
     </div>
     <div class="media">
       <img src="CockpitA400M_1.png" alt="Cockpit-Instrumente eines A400M">
+      <div class="watermark-logo">
+        <img src="Logo_raw_new.png" alt="Logo Wasserzeichen">
+      </div>
     </div>
   </div>
 </section>
@@ -316,6 +333,9 @@
     </div>
     <div class="media">
       <img src="TailA400M_1.png" alt="Seitenleitwerk eines A400M im Abendlicht">
+      <div class="watermark-logo">
+        <img src="Logo_raw_new.png" alt="Logo Wasserzeichen">
+      </div>
     </div>
   </div>
 </section>
@@ -366,31 +386,31 @@
 
         <div class="fleet-grid">
       <div class="plane muted ">
-        <img src="Icon_A400M.png" alt="">
+        <img src="Icon_B727.png" alt="">
         <strong>Boeing B727</strong>
       </div>
       <div class="plane muted">
-        <img src="Icon_A320.png" alt="">
+        <img src="Icon_B737.png" alt="">
         <strong>Boeing B737</strong>
       </div>
       <div class="plane muted">
-        <img src="Icon_A320.png" alt="">
+        <img src="Icon_B757.png" alt="">
         <strong>Boeing B757</strong>
       </div>
       <div class="plane muted">
-        <img src="Icon_A330.png" alt="">
+        <img src="Icon_B767.png" alt="">
         <strong>Beoing B767</strong>
       </div>
       <div class="plane muted">
-        <img src="Icon_A330.png" alt="">
+        <img src="Icon_B777.png" alt="">
         <strong>Boeing B777</strong>
       </div>
       <div class="plane muted">
-        <img src="Icon_A350.png" alt="">
+        <img src="Icon_B787.png" alt="">
         <strong>Boeing B787</strong>
       </div>
       <div class="plane muted">
-        <img src="Icon_A380.png" alt="">
+        <img src="Icon_B747.png" alt="">
         <strong>Boeing B747</strong>
       </div>
     </div>
@@ -406,9 +426,17 @@
       <p class="eyebrow">Flight Ops</p>
       <h2>Routen &amp; Destinations</h2>
       <p>Entdecke beliebte Verbindungen bekannter Fluggesellschaften und fliege reale Strecken im Simulator nach.</p>
+      <div class="chiprow">
+        <a class="chip" href="OPS_Routen.html">Routen &amp; Destinations</a>
+      </div>
     </div>
+      
+
     <div class="media">
       <img src="EngA400M_1.png" alt="Propeller-Triebwerk eines A400M">
+      <div class="watermark-logo">
+        <img src="Logo_raw_new.png" alt="Logo Wasserzeichen">
+      </div>
     </div>
   </div>
 </section>

@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Routen &amp; Destinations — Flight Sim &amp; COFFEE</title>
+<meta name="description" content="Streckennetz diverser Airlines für die private Flugsimulation — Airline wählen, filtern, Strecke nachfliegen.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+
+<style>
+  /* ---------- Page header ---------- */
+  .page-hero{
+    background: var(--ink);
+    color: #fff;
+    padding-block: clamp(2.5rem, 6vw, 4rem) clamp(2rem, 5vw, 3rem);
+  }
+  .breadcrumb{
+    display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+    font-size: 0.85rem; color: #9d9688; margin-bottom: 1.2rem;
+  }
+  .breadcrumb a{ color: #c9c1b1; text-decoration: none; }
+  .breadcrumb a:hover{ color: var(--brass-light); }
+  .page-hero h1{ color: #fff; font-size: clamp(2rem, 4.5vw, 3rem); }
+  .page-hero p{ margin-top: 0.9rem; color: #c9c1b1; max-width: 62ch; font-size: clamp(0.98rem, 1.3vw, 1.08rem); }
+
+  /* ---------- Data status line ---------- */
+  .data-status{
+    display: flex; align-items: center; gap: 0.6rem;
+    margin-top: 1.3rem;
+    font-size: 0.78rem;
+    color: #9d9688;
+  }
+  .data-status .dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #6fbf73;
+    flex-shrink: 0;
+  }
+  .data-status.is-error .dot{ background: #d9584f; }
+  .data-status.is-loading .dot{ background: #e0a536; animation: pulse 1.1s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.35; } }
+
+  /* ---------- Airline picker ---------- */
+  .airline-picker{
+    padding-block: clamp(2rem, 4vw, 2.8rem);
+    border-bottom: 1px solid var(--line);
+  }
+  .picker-label{
+    font-size: 0.85rem; font-weight: 600; color: var(--text-soft); margin-bottom: 1rem;
+  }
+  .airline-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.9rem;
+  }
+  .airline-card{
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+    padding: 1.2rem 0.8rem 1rem;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    font: inherit;
+    color: inherit;
+  }
+  .airline-card:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px -16px rgba(23,27,38,0.35); }
+  .airline-card.active{
+    border-color: var(--brass-dark);
+    box-shadow: 0 0 0 1px var(--brass-dark);
+  }
+  .airline-card.active::after{
+    content: "✓";
+    position: absolute; top: 0.5rem; right: 0.6rem;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--brass-dark);
+    color: #fff;
+    font-size: 0.65rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .airline-badge{
+    position: relative;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .airline-badge img{
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .airline-card strong{
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .airline-card small{ color: var(--text-soft); font-size: 0.74rem; }
+
+  .airline-skeleton{
+    height: 118px;
+    background: linear-gradient(100deg, #f1efe9 30%, #f8f6f1 50%, #f1efe9 70%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s ease-in-out infinite;
+    border: 1.5px solid var(--line);
+  }
+  @keyframes shimmer{ 0%{ background-position: 200% 0; } 100%{ background-position: -200% 0; } }
+
+  /* ---------- Filter bar ---------- */
+  .filter-section{
+    padding-block: clamp(1.6rem, 3vw, 2.2rem);
+    border-bottom: 1px solid var(--line);
+    background: var(--paper-dim);
+  }
+  .filter-row{
+    display: flex; flex-wrap: wrap; gap: 1.6rem 2.2rem;
+    align-items: flex-start;
+  }
+  .filter-group{ display: flex; flex-direction: column; gap: 0.5rem; }
+  .filter-group-label{
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+    text-transform: uppercase; color: var(--text-soft);
+  }
+  .chipset{ display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .fchip{
+    font-family: var(--font-sans, inherit);
+    font-size: 0.82rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .fchip:hover{ border-color: var(--brass-dark); }
+  .fchip.active{
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+  .search-wrap{ position: relative; min-width: 220px; }
+  .search-wrap input{
+    width: 100%;
+    padding: 0.55rem 0.9rem 0.55rem 2.1rem;
+    border: 1px solid var(--line);
+    font-size: 0.88rem;
+    background: #fff;
+    font-family: inherit;
+  }
+  .search-wrap input:focus{ outline: 2px solid var(--brass-dark); outline-offset: -1px; }
+  .search-icon{
+    position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%);
+    width: 15px; height: 15px; color: var(--text-soft); pointer-events: none;
+  }
+  .sort-select{
+    padding: 0.55rem 2rem 0.55rem 0.8rem;
+    border: 1px solid var(--line);
+    background: #fff;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .filter-reset{
+    align-self: flex-end;
+    font-size: 0.8rem;
+    color: var(--brass-dark);
+    background: none; border: none; cursor: pointer;
+    text-decoration: underline;
+    padding: 0.55rem 0;
+  }
+
+  /* ---------- Stats bar ---------- */
+  .stats-bar{
+    display: flex; flex-wrap: wrap; gap: 1.6rem;
+    padding-block: 1.2rem;
+    font-size: 0.85rem;
+    color: var(--text-soft);
+  }
+  .stats-bar strong{ color: var(--ink); font-family: var(--font-display); }
+
+  /* ---------- Results ---------- */
+  .results-section{ padding-block: clamp(1rem, 3vw, 1.6rem) clamp(3rem, 6vw, 4.5rem); }
+
+  .base-group{ margin-bottom: 2.4rem; }
+  .base-group-header{
+    display: flex; align-items: baseline; gap: 0.7rem;
+    padding-bottom: 0.6rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--ink);
+  }
+  .base-group-header h3{
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--ink);
+  }
+  .base-group-header .base-code{
+    font-size: 0.78rem;
+    color: var(--brass-dark);
+    font-weight: 600;
+  }
+  .base-group-header .base-count{
+    margin-left: auto;
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+
+  .route-list{ display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .route-row{
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem 1.1rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+  .route-row:hover{ border-color: var(--brass-dark); box-shadow: 0 10px 24px -18px rgba(23,27,38,0.4); }
+
+  .rr-endpoint{
+    display: flex; flex-direction: column; align-items: center;
+    min-width: 58px;
+  }
+  .rr-endpoint .code{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+  .rr-endpoint .sub{ font-size: 0.68rem; color: var(--text-soft); margin-top: 0.15rem; }
+
+  .rr-flow{
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+  .rr-line{
+    position: relative;
+    width: 100%;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 11px);
+    margin: 0.15rem 0;
+  }
+  .rr-line::after{
+    content: "▸";
+    position: absolute; right: -2px; top: 50%;
+    transform: translateY(-55%);
+    color: var(--brass-dark);
+    font-size: 0.85rem;
+  }
+  .rr-meta{
+    display: flex; gap: 0.5rem; align-items: center;
+    font-size: 0.74rem; color: var(--text-soft);
+    flex-wrap: wrap; justify-content: center;
+    text-align: center;
+  }
+  .rr-dist{ font-weight: 600; color: var(--ink); }
+  .rr-aircraft{ color: var(--text-soft); }
+  .rr-dest-line{ font-size: 0.8rem; color: var(--text); margin-top: 0.1rem; }
+  .rr-dest-line .country{ color: var(--text-soft); }
+
+  .rr-right{
+    display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem;
+    text-align: right;
+    min-width: 110px;
+  }
+  .rr-days{
+    font-size: 0.72rem;
+    color: var(--brass-dark);
+    background: rgba(224,165,54,0.12);
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .empty-state{
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-soft);
+  }
+  .empty-state strong{ display: block; color: var(--ink); font-family: var(--font-display); margin-bottom: 0.4rem; }
+
+  .error-state{
+    padding: 2rem;
+    background: #fdf1f0;
+    border: 1px solid #f0c9c6;
+    color: #7a2b26;
+    font-size: 0.9rem;
+  }
+  .error-state strong{ display: block; margin-bottom: 0.5rem; font-family: var(--font-display); }
+  .error-state code{
+    display: inline-block;
+    background: rgba(122,43,38,0.08);
+    padding: 0.1rem 0.4rem;
+    font-size: 0.85em;
+  }
+
+  @media (max-width: 720px){
+    .route-row{ grid-template-columns: 1fr; text-align: center; }
+    .rr-right{ align-items: center; text-align: center; flex-direction: row; justify-content: center; }
+    .filter-row{ flex-direction: column; gap: 1.2rem; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html">
+      <img src="Logo_raw_new.png" alt="">
+      <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+    </a>
+
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Menü öffnen">
+      <span></span><span></span><span></span>
+    </label>
+
+    <ul class="nav-links">
+      <li><a href="index.html#checklisten">Checklisten</a></li>
+      <li><a href="index.html#events-news">Events / News</a></li>
+      <li><a href="index.html#flugzeugtypen">Flugzeugtypen</a></li>
+      <li><a href="index.html#operations" aria-current="page">Operations</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-hero" id="top">
+  <div class="wrap">
+    <p class="breadcrumb">
+      <a href="index.html">Start</a> <span>／</span>
+      <a href="index.html#operations">Operations</a> <span>／</span>
+      Routen &amp; Destinations
+    </p>
+    <h1>Routen &amp; Destinations</h1>
+    <p>Streckennetze diverser Airlines für die private Flugsimulation. Airline wählen, nach
+       Basis, Reichweite oder Flugzeugtyp filtern — und die nächste Strecke für den Simulator
+       aussuchen.</p>
+    <p class="data-status is-loading" id="dataStatus"><span class="dot"></span><span id="dataStatusText">Lade Streckendaten aus Airlines_Routen.html…</span></p>
+  </div>
+</header>
+
+<!-- AIRLINE PICKER -->
+<div class="wrap airline-picker">
+  <p class="picker-label">1 — Airline wählen</p>
+  <div class="airline-grid" id="airlineGrid">
+    <div class="airline-skeleton"></div>
+    <div class="airline-skeleton"></div>
+    <div class="airline-skeleton"></div>
+    <div class="airline-skeleton"></div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-section">
+  <div class="wrap">
+    <p class="picker-label" style="margin-bottom:1.1rem;">2 — Filtern &amp; sortieren</p>
+    <div class="filter-row">
+
+      <div class="filter-group">
+        <span class="filter-group-label">Base</span>
+        <div class="chipset" id="baseChips"></div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-group-label">Reichweite</span>
+        <div class="chipset" id="rangeChips">
+          <button type="button" class="fchip" data-range="short">Kurzstrecke &lt; 1.200 NM</button>
+          <button type="button" class="fchip" data-range="medium">Mittelstrecke 1.200–3.000 NM</button>
+          <button type="button" class="fchip" data-range="long">Langstrecke ≥ 3.000 NM</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-group-label">Flugzeug</span>
+        <div class="chipset" id="aircraftChips"></div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-group-label">Suche</span>
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Ziel, Land, ICAO, IATA…">
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <span class="filter-group-label">Sortierung</span>
+        <select class="sort-select" id="sortSelect">
+          <option value="base-asc">Base (A–Z)</option>
+          <option value="dist-asc">Entfernung (aufsteigend)</option>
+          <option value="dist-desc">Entfernung (absteigend)</option>
+          <option value="dest-asc">Ziel (A–Z)</option>
+        </select>
+      </div>
+
+      <button type="button" class="filter-reset" id="resetFilters">Filter zurücksetzen</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<section class="results-section">
+  <div class="wrap">
+    <div class="stats-bar" id="statsBar"></div>
+    <div id="resultsContainer"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <a class="brand" href="index.html">
+        <img src="Logo_raw_new.png" alt="">
+        <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+      </a>
+      <p class="foot-note">Alle Inhalte sind vereinfacht und ausschließlich für die private
+         Flugsimulation aufbereitet. Kein Bezug zu realen Betriebsverfahren oder offiziellen
+         Herstellerunterlagen. Streckenangaben ohne Gewähr — Airline-Logos sind Marken der
+         jeweiligen Fluggesellschaften. Streckendaten werden live aus
+         <code>Airlines_Routen.html</code> geladen.</p>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Flight Sim &amp; COFFEE</span>
+      <span>Nur für private Nutzung</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ============================================================
+  // DATENQUELLE
+  // Die Routen werden zur Laufzeit aus Airlines_Routen.html geladen
+  // (per fetch). Diese Datei muss im selben Ordner liegen wie diese
+  // Seite. Neue Airline hinzufügen = einfach weitere Zeilen mit dem
+  // Airline-Namen in der Tabelle in Airlines_Routen.html ergänzen —
+  // an dieser Seite muss nichts geändert werden.
+  //
+  // Tabellenspalten (in dieser Reihenfolge, wie von LibreOffice/Excel
+  // exportiert): Airline | Base | Zielort (Land) | ICAO-Code (IATA) |
+  // Flugtage (Wochentage) | Entfernung (ca. NM) | Standard-Flugzeugtyp
+  // ============================================================
+  const DATA_URL = 'Airlines_Routen.html';
+
+  // Bekannte Airlines: feste Farbe/Logo/Initialen. Für jede Airline,
+  // die hier NICHT gelistet ist, aber in der Tabelle auftaucht, wird
+  // automatisch eine Farbe + Initialen-Badge erzeugt (siehe metaFor()).
+  // Logo-Konvention: airlines/<slug>.png — Datei einfach dort ablegen,
+  // sie wird automatisch verwendet, sobald sie existiert.
+  const AIRLINE_META = {
+    'Condor':            { color: '#F5A300', text: '#1a1a1a', initials: 'CD', logo: 'condor.png' },
+    'Lufthansa':         { color: '#05164D', text: '#ffffff', initials: 'LH', logo: 'lufthansa.png' },
+    'EasyJet':           { color: '#FF6600', text: '#ffffff', initials: 'EJ', logo: 'easyjet.png' },
+    'Eurowings':         { color: '#5B2A86', text: '#ffffff', initials: 'EW', logo: 'eurowings.png' },
+    'Discover Airlines': { color: '#00A19B', text: '#ffffff', initials: '4Y', logo: 'discover.png' },
+    'Sundair':           { color: '#FDB813', text: '#1a1a1a', initials: 'SR', logo: 'sundair.png' }
+  };
+
+  const FALLBACK_PALETTE = ['#2E5EAA', '#B23A48', '#3E7C59', '#8B5E3C', '#4A4E9E', '#C4742D', '#1F7A8C', '#96562D'];
+
+  function slugify(name){
+    return name.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-+|-+$)/g, '');
+  }
+
+  function metaFor(name){
+    if (AIRLINE_META[name]) return AIRLINE_META[name];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    const color = FALLBACK_PALETTE[hash % FALLBACK_PALETTE.length];
+    const words = name.trim().split(/\s+/);
+    const initials = words.length > 1
+      ? words.map(w => w[0]).join('').slice(0, 2).toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+    return { color, text: '#ffffff', initials, logo: `airlines/${slugify(name)}.png` };
+  }
+
+  // "Name (Zusatz)" -> [Name, Zusatz]
+  function splitParen(s){
+    const m = s.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+    return m ? [m[1].trim(), m[2].trim()] : [s.trim(), ''];
+  }
+
+  // "LEPA (PMI)" -> [ICAO, IATA]
+  function splitCode(s){
+    const m = s.match(/^([A-Za-z0-9]+)\s*\(([A-Za-z0-9]+)\)\s*$/);
+    return m ? [m[1], m[2]] : [s.trim(), ''];
+  }
+
+  // "1.130 NM" -> 1130
+  function parseDistance(s){
+    const cleaned = s.replace(/NM/i, '').trim().replace(/\./g, '').replace(/,/g, '.');
+    const v = parseFloat(cleaned);
+    return Number.isFinite(v) ? Math.round(v) : null;
+  }
+
+  async function loadAirlinesFromHTML(url){
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`${url} antwortete mit Status ${res.status}`);
+    const buf = await res.arrayBuffer();
+
+    // Robustes Encoding: Excel/LibreOffice exportiert i. d. R. als
+    // windows-1252. fetch() ignoriert das interne <meta charset>,
+    // deshalb hier explizit dekodieren statt res.text() zu nutzen.
+    let text;
+    try{
+      text = new TextDecoder('windows-1252').decode(buf);
+    } catch(e){
+      text = new TextDecoder('utf-8').decode(buf);
+    }
+
+    const doc = new DOMParser().parseFromString(text, 'text/html');
+    const rows = [...doc.querySelectorAll('tr')];
+    if (!rows.length) throw new Error('Keine Tabelle in Airlines_Routen.html gefunden.');
+
+    const grouped = {};
+    let parsedCount = 0;
+
+    rows.forEach(tr => {
+      const cells = [...tr.querySelectorAll('td')].map(td => td.textContent.replace(/\s+/g, ' ').trim());
+      if (cells.length !== 7) return;
+      const [airline, baseRaw, destRaw, codeRaw, days, distRaw, aircraft] = cells;
+      if (!airline || airline.toLowerCase() === 'airline') return; // Header-Zeile überspringen
+
+      const [base, baseCode] = splitParen(baseRaw);
+      const [destination, country] = splitParen(destRaw);
+      const [icao, iata] = splitCode(codeRaw);
+      const distanceNM = parseDistance(distRaw);
+      if (distanceNM === null || !base || !destination) return;
+
+      const route = { base, baseCode, destination, country, icao, iata, days, distanceNM, aircraft };
+
+      if (!grouped[airline]){
+        const m = metaFor(airline);
+        grouped[airline] = { name: airline, color: m.color, text: m.text, initials: m.initials, logo: m.logo, routes: [] };
+      }
+      grouped[airline].routes.push(route);
+      parsedCount++;
+    });
+
+    if (!parsedCount) throw new Error('Tabelle gefunden, aber keine gültigen Routen-Zeilen erkannt. Spaltenreihenfolge prüfen.');
+
+    const out = {};
+    Object.values(grouped).forEach(a => { out[slugify(a.name)] = a; });
+    return out;
+  }
+
+  // Reichweiten-Grenzen (NM)
+  const RANGE_BOUNDS = {
+    short:  [0, 1199],
+    medium: [1200, 2999],
+    long:   [3000, Infinity]
+  };
+
+  // Flugzeug-Filterfamilien: Label -> Regex, die auf den rohen "aircraft"-String matcht
+  const AIRCRAFT_FAMILIES = [
+    { label: "A319",     re: /A319/ },
+    { label: "A320",     re: /A320(?!neo)/ },
+    { label: "A320neo",  re: /A320neo/ },
+    { label: "A321neo",  re: /A321neo/ },
+    { label: "A330",     re: /A330/ },
+    { label: "A340",     re: /A340/ },
+    { label: "A350",     re: /A350/ },
+    { label: "B747",     re: /747/ }
+  ];
+
+  let AIRLINES = {};
+
+  const state = {
+    airline: null,
+    bases: new Set(),
+    ranges: new Set(),
+    aircraft: new Set(),
+    search: "",
+    sort: "base-asc"
+  };
+
+  const airlineGrid     = document.getElementById('airlineGrid');
+  const baseChipsEl     = document.getElementById('baseChips');
+  const aircraftChipsEl = document.getElementById('aircraftChips');
+  const rangeChipsEl    = document.getElementById('rangeChips');
+  const searchInput     = document.getElementById('searchInput');
+  const sortSelect      = document.getElementById('sortSelect');
+  const statsBar        = document.getElementById('statsBar');
+  const resultsEl       = document.getElementById('resultsContainer');
+  const dataStatusEl    = document.getElementById('dataStatus');
+  const dataStatusText  = document.getElementById('dataStatusText');
+
+  function setStatus(mode, text){
+    dataStatusEl.className = 'data-status' + (mode ? ' is-' + mode : '');
+    dataStatusText.textContent = text;
+  }
+
+  function renderAirlinePicker(){
+    airlineGrid.innerHTML = '';
+    Object.entries(AIRLINES).forEach(([slug, a]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'airline-card' + (state.airline === slug ? ' active' : '');
+      btn.setAttribute('aria-pressed', state.airline === slug ? 'true' : 'false');
+      btn.innerHTML = `
+        <span class="airline-badge" style="background:${a.color};color:${a.text}">
+          <span class="fallback-initials">${a.initials}</span>
+          <img src="${a.logo}" alt="" loading="lazy" onerror="this.remove()">
+        </span>
+        <strong>${a.name}</strong>
+        <small>${a.routes.length} Routen · ${new Set(a.routes.map(r=>r.base)).size} Basen</small>
+      `;
+      btn.addEventListener('click', () => {
+        state.airline = slug;
+        state.bases.clear();
+        state.ranges.clear();
+        state.aircraft.clear();
+        state.search = '';
+        searchInput.value = '';
+        renderAirlinePicker();
+        renderFilters();
+        renderResults();
+      });
+      airlineGrid.appendChild(btn);
+    });
+  }
+
+  function currentAirline(){
+    return state.airline ? AIRLINES[state.airline] : null;
+  }
+
+  function renderFilters(){
+    const airline = currentAirline();
+
+    baseChipsEl.innerHTML = '';
+    if (airline){
+      const bases = [...new Set(airline.routes.map(r => r.base))].sort((a,b)=>a.localeCompare(b,'de'));
+      bases.forEach(base => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'fchip' + (state.bases.has(base) ? ' active' : '');
+        chip.textContent = base;
+        chip.addEventListener('click', () => {
+          state.bases.has(base) ? state.bases.delete(base) : state.bases.add(base);
+          renderFilters();
+          renderResults();
+        });
+        baseChipsEl.appendChild(chip);
+      });
+    } else {
+      baseChipsEl.innerHTML = '<span style="font-size:0.8rem;color:var(--text-soft);">— zuerst Airline wählen —</span>';
+    }
+
+    aircraftChipsEl.innerHTML = '';
+    if (airline){
+      const relevant = AIRCRAFT_FAMILIES.filter(fam =>
+        airline.routes.some(r => fam.re.test(r.aircraft))
+      );
+      relevant.forEach(fam => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'fchip' + (state.aircraft.has(fam.label) ? ' active' : '');
+        chip.textContent = fam.label;
+        chip.addEventListener('click', () => {
+          state.aircraft.has(fam.label) ? state.aircraft.delete(fam.label) : state.aircraft.add(fam.label);
+          renderFilters();
+          renderResults();
+        });
+        aircraftChipsEl.appendChild(chip);
+      });
+    } else {
+      aircraftChipsEl.innerHTML = '<span style="font-size:0.8rem;color:var(--text-soft);">—</span>';
+    }
+
+    [...rangeChipsEl.children].forEach(chip => {
+      const r = chip.dataset.range;
+      chip.classList.toggle('active', state.ranges.has(r));
+    });
+  }
+
+  rangeChipsEl.addEventListener('click', (e) => {
+    const chip = e.target.closest('.fchip');
+    if (!chip) return;
+    const r = chip.dataset.range;
+    state.ranges.has(r) ? state.ranges.delete(r) : state.ranges.add(r);
+    renderFilters();
+    renderResults();
+  });
+
+  searchInput.addEventListener('input', (e) => {
+    state.search = e.target.value.trim().toLowerCase();
+    renderResults();
+  });
+
+  sortSelect.addEventListener('change', (e) => {
+    state.sort = e.target.value;
+    renderResults();
+  });
+
+  document.getElementById('resetFilters').addEventListener('click', () => {
+    state.bases.clear();
+    state.ranges.clear();
+    state.aircraft.clear();
+    state.search = '';
+    searchInput.value = '';
+    renderFilters();
+    renderResults();
+  });
+
+  function matchesFilters(route){
+    if (state.bases.size && !state.bases.has(route.base)) return false;
+    if (state.aircraft.size){
+      const ok = [...state.aircraft].some(label => {
+        const fam = AIRCRAFT_FAMILIES.find(f => f.label === label);
+        return fam && fam.re.test(route.aircraft);
+      });
+      if (!ok) return false;
+    }
+    if (state.ranges.size){
+      const ok = [...state.ranges].some(r => {
+        const [min, max] = RANGE_BOUNDS[r];
+        return route.distanceNM >= min && route.distanceNM <= max;
+      });
+      if (!ok) return false;
+    }
+    if (state.search){
+      const hay = `${route.destination} ${route.country} ${route.icao} ${route.iata} ${route.base}`.toLowerCase();
+      if (!hay.includes(state.search)) return false;
+    }
+    return true;
+  }
+
+  function sortRoutes(routes){
+    const arr = [...routes];
+    switch(state.sort){
+      case 'dist-asc':  arr.sort((a,b) => a.distanceNM - b.distanceNM); break;
+      case 'dist-desc': arr.sort((a,b) => b.distanceNM - a.distanceNM); break;
+      case 'dest-asc':  arr.sort((a,b) => a.destination.localeCompare(b.destination, 'de')); break;
+      case 'base-asc':
+      default:
+        arr.sort((a,b) => a.base.localeCompare(b.base, 'de') || a.distanceNM - b.distanceNM);
+    }
+    return arr;
+  }
+
+  function renderResults(){
+    const airline = currentAirline();
+
+    if (!airline){
+      statsBar.innerHTML = '';
+      resultsEl.innerHTML = `
+        <div class="empty-state">
+          <strong>Noch keine Airline gewählt</strong>
+          Wähle oben eine Airline aus, um ihr Streckennetz zu sehen.
+        </div>`;
+      return;
+    }
+
+    const filtered = sortRoutes(airline.routes.filter(matchesFilters));
+
+    const bases = new Set(filtered.map(r => r.base));
+    const avgDist = filtered.length
+      ? Math.round(filtered.reduce((s,r) => s + r.distanceNM, 0) / filtered.length)
+      : 0;
+
+    statsBar.innerHTML = `
+      <span><strong>${filtered.length}</strong> von ${airline.routes.length} Routen</span>
+      <span><strong>${bases.size}</strong> Basen</span>
+      <span>Ø <strong>${avgDist.toLocaleString('de-DE')}</strong> NM</span>
+    `;
+
+    if (!filtered.length){
+      resultsEl.innerHTML = `
+        <div class="empty-state">
+          <strong>Keine Routen gefunden</strong>
+          Passe die Filter oder die Suche an.
+        </div>`;
+      return;
+    }
+
+    if (state.sort === 'dist-asc' || state.sort === 'dist-desc' || state.sort === 'dest-asc'){
+      resultsEl.innerHTML = `<div class="route-list">${filtered.map(routeRowHTML).join('')}</div>`;
+      return;
+    }
+
+    const groups = {};
+    filtered.forEach(r => { (groups[r.base] = groups[r.base] || []).push(r); });
+
+    resultsEl.innerHTML = Object.entries(groups).map(([base, rts]) => `
+      <div class="base-group">
+        <div class="base-group-header">
+          <h3>${base}</h3>
+          <span class="base-code">${rts[0].baseCode}</span>
+          <span class="base-count">${rts.length} Ziele</span>
+        </div>
+        <div class="route-list">
+          ${rts.map(routeRowHTML).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function baseAirportCode(r){
+    const parts = r.baseCode.split('/');
+    return (parts[1] ? parts[1].trim() : r.base.slice(0,3).toUpperCase());
+  }
+
+  function routeRowHTML(r){
+    return `
+      <div class="route-row">
+        <div class="rr-endpoint">
+          <span class="code">${baseAirportCode(r)}</span>
+          <span class="sub">${r.base}</span>
+        </div>
+        <div class="rr-flow">
+          <div class="rr-line"></div>
+          <div class="rr-meta">
+            <span class="rr-dist">${r.distanceNM.toLocaleString('de-DE')} NM</span>
+            <span>·</span>
+            <span class="rr-aircraft">${r.aircraft}</span>
+          </div>
+          <div class="rr-dest-line">${r.destination} <span class="country">(${r.country})</span></div>
+        </div>
+        <div class="rr-endpoint">
+          <span class="code">${r.iata}</span>
+          <span class="sub">${r.icao}</span>
+        </div>
+        <div class="rr-right" style="grid-column: 1 / -1; justify-self:end; margin-top:-0.4rem;">
+          <span class="rr-days">${r.days}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function showFatalError(err){
+    setStatus('error', 'Streckendaten konnten nicht geladen werden.');
+    airlineGrid.innerHTML = '';
+    const isFileProtocol = location.protocol === 'file:';
+    resultsEl.innerHTML = `
+      <div class="error-state">
+        <strong>Airlines_Routen.html konnte nicht geladen werden</strong>
+        <p style="margin-bottom:0.6rem;">${err.message || err}</p>
+        ${isFileProtocol ? `
+          <p>Diese Seite wurde direkt als lokale Datei geöffnet (<code>file://</code>).
+          Aus Sicherheitsgründen blockieren Browser dabei das Nachladen anderer Dateien.
+          Öffne die Seite stattdessen über einen (lokalen oder echten) Webserver, z. B.
+          mit <code>python3 -m http.server</code> im Projektordner, oder lade beide
+          Dateien wie vorgesehen auf deinen Webserver hoch.</p>
+        ` : `
+          <p>Bitte prüfen: liegt <code>Airlines_Routen.html</code> im selben Ordner wie
+          diese Seite, und ist der Dateiname exakt richtig geschrieben (Groß-/Kleinschreibung)?</p>
+        `}
+      </div>`;
+  }
+
+  async function init(){
+    try{
+      AIRLINES = await loadAirlinesFromHTML(DATA_URL);
+      const totalRoutes = Object.values(AIRLINES).reduce((s,a) => s + a.routes.length, 0);
+      setStatus('', `${Object.keys(AIRLINES).length} Airlines · ${totalRoutes} Routen geladen`);
+      renderAirlinePicker();
+      renderFilters();
+      renderResults();
+    } catch(err){
+      showFatalError(err);
+    }
+  }
+
+  init();
+</script>
+
+</body>
+</html>
