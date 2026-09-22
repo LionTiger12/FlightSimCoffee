@@ -465,15 +465,20 @@
   // Bekannte Airlines: feste Farbe/Logo/Initialen. Für jede Airline,
   // die hier NICHT gelistet ist, aber in der Tabelle auftaucht, wird
   // automatisch eine Farbe + Initialen-Badge erzeugt (siehe metaFor()).
-  // Logo-Konvention: airlines/<slug>.png — Datei einfach dort ablegen,
-  // sie wird automatisch verwendet, sobald sie existiert.
+  // Logo-Konvention: <slug>.png im selben Ordner wie diese Seite —
+  // Datei einfach dort ablegen, sie wird automatisch verwendet, sobald
+  // sie existiert.
   const AIRLINE_META = {
     'Condor':            { color: '#F5A300', text: '#1a1a1a', initials: 'CD', logo: 'condor.png' },
     'Lufthansa':         { color: '#05164D', text: '#ffffff', initials: 'LH', logo: 'lufthansa.png' },
     'EasyJet':           { color: '#FF6600', text: '#ffffff', initials: 'EJ', logo: 'easyjet.png' },
     'Eurowings':         { color: '#5B2A86', text: '#ffffff', initials: 'EW', logo: 'eurowings.png' },
     'Discover Airlines': { color: '#00A19B', text: '#ffffff', initials: '4Y', logo: 'discover.png' },
-    'Sundair':           { color: '#FDB813', text: '#1a1a1a', initials: 'SR', logo: 'sundair.png' }
+    'Sundair':           { color: '#FDB813', text: '#1a1a1a', initials: 'SR', logo: 'sundair.png' },
+    'Vueling':           { color: '#FFCD00', text: '#1a1a1a', initials: 'VY', logo: 'vueling.png' },
+    'Transavia':         { color: '#00A651', text: '#ffffff', initials: 'HV', logo: 'transavia.png' },
+    'United Airlines':   { color: '#0032A0', text: '#ffffff', initials: 'UA', logo: 'united.png' },
+    'Emirates':          { color: '#D71921', text: '#ffffff', initials: 'EK', logo: 'emirates.png' }
   };
 
   const FALLBACK_PALETTE = ['#2E5EAA', '#B23A48', '#3E7C59', '#8B5E3C', '#4A4E9E', '#C4742D', '#1F7A8C', '#96562D'];
@@ -494,7 +499,7 @@
     const initials = words.length > 1
       ? words.map(w => w[0]).join('').slice(0, 2).toUpperCase()
       : name.slice(0, 2).toUpperCase();
-    return { color, text: '#ffffff', initials, logo: `airlines/${slugify(name)}.png` };
+    return { color, text: '#ffffff', initials, logo: `${slugify(name)}.png` };
   }
 
   // "Name (Zusatz)" -> [Name, Zusatz]
@@ -576,14 +581,21 @@
 
   // Flugzeug-Filterfamilien: Label -> Regex, die auf den rohen "aircraft"-String matcht
   const AIRCRAFT_FAMILIES = [
+    { label: "A220",     re: /A220/ },
     { label: "A319",     re: /A319/ },
     { label: "A320",     re: /A320(?!neo)/ },
     { label: "A320neo",  re: /A320neo/ },
+    { label: "A321",     re: /A321(?!neo)/ },
     { label: "A321neo",  re: /A321neo/ },
     { label: "A330",     re: /A330/ },
     { label: "A340",     re: /A340/ },
     { label: "A350",     re: /A350/ },
-    { label: "B747",     re: /747/ }
+    { label: "A380",     re: /A380/ },
+    { label: "B737",     re: /737/ },
+    { label: "B747",     re: /747/ },
+    { label: "B767",     re: /767/ },
+    { label: "B777",     re: /777/ },
+    { label: "B787",     re: /787/ }
   ];
 
   let AIRLINES = {};
