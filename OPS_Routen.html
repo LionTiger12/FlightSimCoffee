@@ -437,8 +437,7 @@
       <p class="foot-note">Alle Inhalte sind vereinfacht und ausschließlich für die private
          Flugsimulation aufbereitet. Kein Bezug zu realen Betriebsverfahren oder offiziellen
          Herstellerunterlagen. Streckenangaben ohne Gewähr — Airline-Logos sind Marken der
-         jeweiligen Fluggesellschaften. Streckendaten werden live aus
-         <code>Airlines_Routen.html</code> geladen.</p>
+         jeweiligen Fluggesellschaften. 
     </div>
     <div class="foot-legal">
       <span>© 2026 Flight Sim &amp; COFFEE</span>
@@ -469,16 +468,16 @@
   // Datei einfach dort ablegen, sie wird automatisch verwendet, sobald
   // sie existiert.
   const AIRLINE_META = {
-    'Condor':            { color: '#F5A300', text: '#1a1a1a', initials: 'CD', logo: 'condor.png' },
-    'Lufthansa':         { color: '#05164D', text: '#ffffff', initials: 'LH', logo: 'lufthansa.png' },
-    'EasyJet':           { color: '#FF6600', text: '#ffffff', initials: 'EJ', logo: 'easyjet.png' },
-    'Eurowings':         { color: '#5B2A86', text: '#ffffff', initials: 'EW', logo: 'eurowings.png' },
-    'Discover Airlines': { color: '#00A19B', text: '#ffffff', initials: '4Y', logo: 'discover.png' },
-    'Sundair':           { color: '#FDB813', text: '#1a1a1a', initials: 'SR', logo: 'sundair.png' },
-    'Vueling':           { color: '#FFCD00', text: '#1a1a1a', initials: 'VY', logo: 'vueling.png' },
-    'Transavia':         { color: '#00A651', text: '#ffffff', initials: 'HV', logo: 'transavia.png' },
-    'United Airlines':   { color: '#0032A0', text: '#ffffff', initials: 'UA', logo: 'united.png' },
-    'Emirates':          { color: '#D71921', text: '#ffffff', initials: 'EK', logo: 'emirates.png' }
+    'Condor':            { color: '#F5A300', text: '#1a1a1a', initials: 'CD'},
+    'Lufthansa':         { color: '#05164D', text: '#ffffff', initials: 'LH'},
+    'EasyJet':           { color: '#FF6600', text: '#ffffff', initials: 'EJ'},
+    'Eurowings':         { color: '#5B2A86', text: '#ffffff', initials: 'EW'},
+    'Discover Airlines': { color: '#00A19B', text: '#ffffff', initials: '4Y'},
+    'Sundair':           { color: '#FDB813', text: '#1a1a1a', initials: 'SR'},
+    'Vueling':           { color: '#FFCD00', text: '#1a1a1a', initials: 'VY'},
+    'Transavia':         { color: '#00A651', text: '#ffffff', initials: 'HV'},
+    'United Airlines':   { color: '#0032A0', text: '#ffffff', initials: 'UA'},
+    'Emirates':          { color: '#D71921', text: '#ffffff', initials: 'EK'}
   };
 
   const FALLBACK_PALETTE = ['#2E5EAA', '#B23A48', '#3E7C59', '#8B5E3C', '#4A4E9E', '#C4742D', '#1F7A8C', '#96562D'];
@@ -499,7 +498,7 @@
     const initials = words.length > 1
       ? words.map(w => w[0]).join('').slice(0, 2).toUpperCase()
       : name.slice(0, 2).toUpperCase();
-    return { color, text: '#ffffff', initials, logo: `${slugify(name)}.png` };
+    return { color, text: '#ffffff', initials};
   }
 
   // "Name (Zusatz)" -> [Name, Zusatz]
@@ -559,7 +558,7 @@
 
       if (!grouped[airline]){
         const m = metaFor(airline);
-        grouped[airline] = { name: airline, color: m.color, text: m.text, initials: m.initials, logo: m.logo, routes: [] };
+        grouped[airline] = { name: airline, color: m.color, text: m.text, initials: m.initials, routes: [] };
       }
       grouped[airline].routes.push(route);
       parsedCount++;
@@ -635,7 +634,6 @@
       btn.innerHTML = `
         <span class="airline-badge" style="background:${a.color};color:${a.text}">
           <span class="fallback-initials">${a.initials}</span>
-          <img src="${a.logo}" alt="" loading="lazy" onerror="this.remove()">
         </span>
         <strong>${a.name}</strong>
         <small>${a.routes.length} Routen · ${new Set(a.routes.map(r=>r.base)).size} Basen</small>
