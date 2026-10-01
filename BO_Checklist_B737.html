@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B737 Checkliste — Flight Sim &amp; COFFEE</title>
+<meta name="description" content="Vollständige Checkliste für die Boeing 737 (900/900ER/800/MAX 8) in der privaten Flugsimulation.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+
+<style>
+  /* ---------- Page header ---------- */
+  .page-hero{
+    background: var(--ink);
+    color: #fff;
+    padding-block: clamp(2.5rem, 6vw, 4rem) clamp(2rem, 5vw, 3rem);
+  }
+
+  .breadcrumb{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #9d9688;
+    margin-bottom: 1.2rem;
+  }
+
+  .breadcrumb a{
+    color: #c9c1b1;
+    text-decoration: none;
+  }
+  .breadcrumb a:hover{ color: var(--brass-light); }
+
+  .page-hero h1{
+    color: #fff;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+  }
+
+  .page-hero p{
+    margin-top: 0.9rem;
+    color: #c9c1b1;
+    max-width: 62ch;
+    font-size: clamp(0.98rem, 1.3vw, 1.08rem);
+  }
+
+  /* ---------- On-page contents ---------- */
+  .toc{
+    padding-block: clamp(1.8rem, 3vw, 2.4rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .toc-label{
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    margin-bottom: 1rem;
+  }
+
+  /* ---------- Checklist item sections ---------- */
+  .checklist-item{
+    padding-block: clamp(3rem, 6vw, 4.5rem);
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 84px;
+  }
+
+  .checklist-item .eyebrow{ margin-bottom: 0.6rem; }
+
+  .checklist-item h2{
+    display: block;
+    max-width: 720px;
+    box-sizing: border-box;
+    font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+    margin-bottom: 0.9rem;
+    background: var(--ink);
+    color: #fff;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--ink);
+  }
+
+  .checklist-item .item-desc{
+    color: var(--text-soft);
+    max-width: 66ch;
+    margin-bottom: 1.8rem;
+  }
+
+  .checklist-item h3.block-title{
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--ink);
+    margin: 2rem 0 0.8rem;
+  }
+  .checklist-item h3.block-title:first-of-type{ margin-top: 0; }
+
+  .checklist-item:nth-of-type(even){
+  background-color: #f6f3ec; 
+}
+
+  /* ---------- Show only the selected checklist ---------- */
+  .checklist-item{
+    display: none;
+  }
+  .checklist-item.is-visible{
+    display: block;
+  }
+
+  .cl-toc-btn.is-active{
+    background: var(--brass-dark);
+    border-color: var(--brass-dark);
+  }
+  .cl-toc-btn.is-active .num{
+    color: #fff;
+  }
+
+  .back-to-top{
+    margin-top: 1.6rem;
+    display: inline-block;
+    font-size: 0.85rem;
+    color: var(--brass-dark);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .back-to-top:hover{ text-decoration: underline; }
+
+  .panel-media::before, .panel-media::after{
+  content: "";
+  position: absolute;
+  width: 22px; height: 22px;
+  border: 2px solid var(--brass);
+  z-index: 2;
+}
+.panel-media::before{ top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.panel-media::after{ bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  /* ---------- Legend ---------- */
+  .legend{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    margin-top: 1.4rem;
+    font-size: 0.78rem;
+    color: var(--text-soft);
+  }
+  .legend b{ color: var(--brass-dark); }
+
+  /* ---------- ATC radio call boxes ---------- */
+  .atc-call{
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    background: rgba(224,165,54,0.10);
+    border-left: 3px solid var(--brass-dark);
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+  .atc-call .num{
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--brass-dark);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 0.1rem;
+  }
+  .atc-call .txt strong{ color: var(--ink); }
+  .atc-call .txt em{ color: var(--text-soft); font-style: italic; display: block; margin-top: 0.2rem; }
+
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html">
+      <img src="Logo_raw_new.png" alt="">
+      <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+    </a>
+
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Menü öffnen">
+      <span></span><span></span><span></span>
+    </label>
+
+    <ul class="nav-links">
+      <li><a href="index.html#checklisten" aria-current="page">Checklisten</a></li>
+      <li><a href="index.html#prozeduren">Prozeduren</a></li>
+      <li><a href="index.html#flugzeugtypen">Flugzeugtypen</a></li>
+      <li><a href="index.html#operations">Operations</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-hero" id="top">
+  <div class="wrap">
+    <p class="breadcrumb">
+      <a href="index.html">Start</a> <span>／</span>
+      <a href="BO_Checklist.html">Boeing</a> <span>／</span>
+      B737 Checkliste
+    </p>
+    <h1>Boeing 737 — Checkliste</h1>
+    <p>Alle 14 Checklisten-Punkte für die B737-Familie (900 / 900ER / 800 / MAX 8) an einem Ort —
+       inklusive Funksprüchen als Merkhilfe für den Sprechfunk. Getippte Punkte werden lokal in
+       deinem Browser gemerkt.</p>
+  </div>
+</header>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <div class="wrap">
+    <p class="toc-label">Zu einer Checkliste springen</p>
+    <nav class="cl-toc" aria-label="Checklisten-Punkte">
+      <a class="cl-toc-btn" href="#specs-limits"><span class="num">01</span><strong>Specs &amp; Limits</strong><small>Varianten im Vergleich</small></a>
+      <a class="cl-toc-btn" href="#cockpit-prep"><span class="num">02</span><strong>Cockpit Preparation</strong><small>Panels, EFB &amp; CDU</small></a>
+      <a class="cl-toc-btn" href="#before-start"><span class="num">03</span><strong>Before Start</strong><small>Vor Triebwerksstart</small></a>
+      <a class="cl-toc-btn" href="#after-start"><span class="num">04</span><strong>After Start</strong><small>Nach Triebwerksstart</small></a>
+      <a class="cl-toc-btn" href="#before-taxi"><span class="num">05</span><strong>Before Taxi</strong><small>Vor dem Rollen</small></a>
+      <a class="cl-toc-btn" href="#before-takeoff"><span class="num">06</span><strong>Before Take Off</strong><small>Startvorbereitung</small></a>
+      <a class="cl-toc-btn" href="#after-takeoff"><span class="num">07</span><strong>After Take Off</strong><small>Nach dem Start</small></a>
+      <a class="cl-toc-btn" href="#climb"><span class="num">08</span><strong>Climb</strong><small>Steigflug</small></a>
+      <a class="cl-toc-btn" href="#cruise"><span class="num">09</span><strong>Cruise</strong><small>Reiseflug</small></a>
+      <a class="cl-toc-btn" href="#descend"><span class="num">10</span><strong>Descend</strong><small>Sinkflug</small></a>
+      <a class="cl-toc-btn" href="#before-landing"><span class="num">11</span><strong>Before Landing</strong><small>Vor der Landung</small></a>
+      <a class="cl-toc-btn" href="#after-landing"><span class="num">12</span><strong>After Landing</strong><small>Nach der Landung</small></a>
+      <a class="cl-toc-btn" href="#parking-shutdown"><span class="num">13</span><strong>Parking - Shutdown</strong><small>Parken &amp; Abstellen</small></a>
+      <a class="cl-toc-btn" href="#secure-aircraft"><span class="num">14</span><strong>Secure Aircraft</strong><small>Flugzeug sichern</small></a>
+    </nav>
+  </div>
+</div>
+
+<!-- 01 SPECS & LIMITS -->
+<section class="checklist-item" id="specs-limits">
+  <div class="wrap">
+    <p class="eyebrow">01 — Specs &amp; Limits</p>
+    <h2>Specs &amp; Limits</h2>
+    <p class="item-desc">Referenzwerte für die vier gängigen 737-Varianten — keine Checkliste,
+       sondern Kennzahlen zum Nachschlagen.</p>
+
+    <div class="proc-back">
+    <div class="proc-table-wrap">
+      <p class="proc-table-title">Varianten im Vergleich</p>
+      <table class="proc-table">
+        <thead>
+          <tr><th></th><th>737-900</th><th>737-900ER</th><th>737-800</th><th>737 MAX 8</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Max Range</td><td>2.730 NM</td><td>3.000 NM</td><td>3.115 NM</td><td>3.550 NM</td></tr>
+          <tr><td>Max ZFW</td><td>68 t</td><td>69 t</td><td>65 t</td><td>65 t</td></tr>
+          <tr><td>Max Fuel</td><td>26 t</td><td>26 t</td><td>26 t</td><td>26 t</td></tr>
+          <tr><td>Max TOW</td><td>79 t</td><td>85 t</td><td>79 t</td><td>82 t</td></tr>
+          <tr><td>Max LW</td><td>67 t</td><td>71 t</td><td>66 t</td><td>79 t</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="proc-notes">
+      <p class="proc-sub">Typisches Reiseflug-Profil (737-800, Richtwerte)</p>
+      <ul>
+        <li>&lt; 30 min Flugzeit → FL150 @ 440 kt, ca. 63 % N1</li>
+        <li>&lt; 1,5 h Flugzeit → FL240 @ 460 kt, ca. 66 % N1</li>
+        <li>2 h Flugzeit → FL350 @ 470 kt, ca. 68 % N1</li>
+        <li>Langstrecke → FL390 @ 440 kt, ca. 68 % N1</li>
+      </ul>
+      <p class="proc-sub">Anflug-Richtgeschwindigkeiten (Flaps-Manövriergeschwindigkeiten, Richtwerte)</p>
+      <ul>
+        <li>Flaps UP Manövriergeschwindigkeit — Ausgangspunkt für den Sinkflug-Speed-Abbau</li>
+        <li>Flaps 1 → Flaps 5 → Flaps 15 → Flaps 30/40 jeweils erst bei/unter der
+            Manövriergeschwindigkeit der aktuellen Klappenstellung wählen (nicht als Bremse nutzen)</li>
+        <li>Landung meist mit Flaps 30 (Flaps 40 bei kurzer Bahn oder steilerem Anflugwinkel)</li>
+        <li>VREF ≈ 1,3 × Stallgeschwindigkeit, VAPP = VREF + Windkorrektur (min. 5 kt, max. 15 kt)</li>
+      </ul>
+    </div>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#cockpit-prep">↓ Nächste Checkliste - 02 Cockpit Preparation</a>
+  </div>
+</section>
+
+<!-- 02 COCKPIT PREPARATION -->
+<section class="checklist-item" id="cockpit-prep">
+  <div class="wrap">
+    <p class="eyebrow">02 — Cockpit Preparation</p>
+    <h2>Cockpit Preparation</h2>
+    <p class="item-desc">Panels einrichten, EFB und CDU/FMC vorbereiten sowie IFR-Freigabe einholen.</p>
+
+    <div class="proc-back">
+    <h3 class="block-title">Cockpit Preparation</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">ATIS / SimBrief</span><span class="row-state">CHECK / GENERATE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* GPU / Jetway or Stairs (GSX)</span><span class="row-state">REQUEST</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Fuel KG / Catering (GSX)</span><span class="row-state">REQUEST</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Battery / External Power</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* Dome</span><span class="row-state">DIM</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Parking Brake</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">IRS</span><span class="row-state">NAV</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Cab / Util or Galley / IFE / Pass Seats</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Service Interphone</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Circuit Breaker</span><span class="row-state">5%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Panel Bright</span><span class="row-state">25%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Emer Lights</span><span class="row-state">ARM</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ No Smoking / Chime Only</span><span class="row-state">AUTO</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Fasten Belts</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Logo Light</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Position Light (NAV)</span><span class="row-state">STEADY</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Compass Light</span><span class="row-state">ON</span></span></button></li>
+    </ul>
+
+    <h3 class="block-title">Pedestal Panel</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Panel Bright</span><span class="row-state">25%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Flood Bright</span><span class="row-state">5%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Standby Instrument Bright</span><span class="row-state">25%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cpt / Cop CDU Bright</span><span class="row-state">50%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Fault Inop / Ovht Fire</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">VHF1 / FLT / SVC / PA</span><span class="row-state">ON / VOL 50%</span></span></button></li>
+    </ul>
+
+    <h3 class="block-title">Instrument Panel</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cpt / Cop Main Panel</span><span class="row-state">25%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cpt / Cop Inbd DU</span><span class="row-state">25%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cpt / Cop Outbd DU</span><span class="row-state">25%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Upper DU / Lower DU</span><span class="row-state">25%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Background</span><span class="row-state">5%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">AFDS Flood</span><span class="row-state">5%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cpt / Cop Map / Chart</span><span class="row-state">5%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Lights Test</span><span class="row-state">DIM</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cpt / Cop EFP Bright</span><span class="row-state">5%</span></span></button></li>
+    </ul>
+
+    <h3 class="block-title">Electronic Flight Bag (EFB)</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Maintenance</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Performance / Payload</span><span class="row-state">MSFS DATA</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Flt Details: Data</span><span class="row-state">REQUEST</span></span></button></li>
+    </ul>
+
+    <h3 class="block-title">Control and Display Unit (CDU)</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Ident</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Pos Init</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Route</span><span class="row-state">REQUEST / ACTIVE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Payload / Fuel</span><span class="row-state">SET / LOAD</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Dep Information</span><span class="row-state">OFP</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Rte Copy</span><span class="row-state">COMPLETE</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">1</span>
+      <span class="txt"><strong>(ICAO) DEL,</strong> Good day (Call Sign) radio check.</span>
+    </div>
+    <div class="atc-call">
+      <span class="num">2</span>
+      <span class="txt">
+        <strong>(Call Sign)</strong> request IFR clearance to (City) Information_.
+        <em>except RWY_ / via [SID]_ departure / with _TRANS.</em>
+        <em>OR except radar vectors *INTL CLMB_ / SQWK_ / DEP FREQ_.</em>
+      </span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Boarding / Cgo Loading (GSX)</span><span class="row-state">REQUEST</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">APU</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Legs: No Disconnect</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Nav Status</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Winds</span><span class="row-state">REQUEST</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">▲ Perf</span><span class="row-state">OFP</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">T.O Perf 2/2</span><span class="row-state">METAR</span></span></button></li>
+    </ul>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="cockpit-prep">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="cockpit-prep">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#before-start">↓ Nächste Checkliste - 03 Before Start</a>
+  </div>
+</section>
+
+<!-- 03 BEFORE START -->
+<section class="checklist-item" id="before-start">
+  <div class="wrap">
+    <p class="eyebrow">03 — Before Start</p>
+    <h2>Before Start</h2>
+    <p class="item-desc">MCP-Setup, N1-Limit und Push-back-Freigabe vor dem Triebwerksstart.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Yaw Damper</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* Fuel Pumps</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">APU Gen</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Window Heat / Probe</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Hyd Pumps</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Abu Bleed</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Altimeter / Standby Instrument</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">VOR / MAP / DATA / TFC / FD / AT ARM / LNAV / VNAV (MCP)</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">RWY HDG / Intl Clmb Alt / Ovhd Flt Alt (MCP)</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">PFD Range</span><span class="row-state">20</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Navigraph Chart: Brief Taxi to RWY_</span><span class="row-state">EFB</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">TCAS</span><span class="row-state">SET / STBY</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* N1 Limit</span><span class="row-state">EFB</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">T.O Perf 1/2 - MCP: V2 IAS</span><span class="row-state">EFB</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Prepare Departure (GSX)</span><span class="row-state">REQUEST</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Doors</span><span class="row-state">CLOSE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Chocks / GPU</span><span class="row-state">OFF</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">3</span>
+      <span class="txt"><strong>(ICAO) GND,</strong> Good day (Call Sign) at gate_, request pushback and
+        startup. Face_ / Altimeter_.</span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Anti Collision Light (Beacon)</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Wing Light</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Parking Brake</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Engines</span><span class="row-state">ON</span></span></button></li>
+    </ul>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="before-start">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="before-start">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#after-start">↓ Nächste Checkliste - 04 After Start</a>
+  </div>
+</section>
+
+<!-- 04 AFTER START -->
+<section class="checklist-item" id="after-start">
+  <div class="wrap">
+    <p class="eyebrow">04 — After Start</p>
+    <h2>After Start</h2>
+    <p class="item-desc">Nach Triebwerksstart — Trimm, Generatoren/Packs und QRC-Checkliste.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Flps / Trim</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Rudder Trim</span><span class="row-state">ZERO</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Auto Brk</span><span class="row-state">RTO</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Eng Gens / Packs / Iso Valve</span><span class="row-state">ON / AUTO</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">APU Bleed / APU</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Flight Controls</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">QRC Checklist</span><span class="row-state">COMPLETE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Navigraph Chart: Display Taxi to RWY_</span><span class="row-state">EFB</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Equipment</span><span class="row-state">CLEAR</span></span></button></li>
+    </ul>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="after-start">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="after-start">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#before-taxi">↓ Nächste Checkliste - 05 Before Taxi</a>
+  </div>
+</section>
+
+<!-- 05 BEFORE TAXI -->
+<section class="checklist-item" id="before-taxi">
+  <div class="wrap">
+    <p class="eyebrow">05 — Before Taxi</p>
+    <h2>Before Taxi</h2>
+    <p class="item-desc">Vor dem Rollen — Anti-Ice, Lichter und Rollfreigabe.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">★ Wing / Eng Anti-Ice</span><span class="row-state">AS REQ</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">WX / Terr</span><span class="row-state">AS REQ</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Dome</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Wing Light</span><span class="row-state">OFF</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">4</span>
+      <span class="txt">
+        <strong>(ICAO) GND,</strong> (Call Sign) request taxi to RWY_.
+        <em>taxi to hold point_ / OR hold short RWY_ / via_.</em>
+      </span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Taxi Light</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Steering / Brakes</span><span class="row-state">CHECK</span></span></button></li>
+    </ul>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="before-taxi">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="before-taxi">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#before-takeoff">↓ Nächste Checkliste - 06 Before Take Off</a>
+  </div>
+</section>
+
+<!-- 06 BEFORE TAKE OFF -->
+<section class="checklist-item" id="before-takeoff">
+  <div class="wrap">
+    <p class="eyebrow">06 — Before Take Off</p>
+    <h2>Before Take Off</h2>
+    <p class="item-desc">Startvorbereitung — letzte Prüfungen vor der Startfreigabe.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Traffic</span><span class="row-state">CLEAR</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cabin Crew</span><span class="row-state">ADVISE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Eng Start</span><span class="row-state">CONT</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ HUD / Brit</span><span class="row-state">DEPLOY / 5%</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">5</span>
+      <span class="txt"><strong>(ICAO) TWR,</strong> Good day (Call Sign) holding short RWY_, ready for
+        departure.</span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Landing / Runway Lights</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Taxi Light</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Position Light</span><span class="row-state">STROBE &amp; STEADY</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Chrono / TA-RA</span><span class="row-state">ON</span></span></button></li>
+    </ul>
+
+    <div class="proc-notes">
+      <ul>
+        <li>Fwd Press to 100 KT → Release → Rotate @ VR</li>
+      </ul>
+    </div>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="before-takeoff">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="before-takeoff">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#after-takeoff">↓ Nächste Checkliste - 07 After Take Off</a>
+  </div>
+</section>
+
+<!-- 07 AFTER TAKE OFF -->
+<section class="checklist-item" id="after-takeoff">
+  <div class="wrap">
+    <p class="eyebrow">07 — After Take Off</p>
+    <h2>After Take Off</h2>
+    <p class="item-desc">Nach dem Abheben — Fahrwerk einfahren und Abflugmeldungen absetzen.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Landing Gear</span><span class="row-state">UP</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">6</span>
+      <span class="txt"><strong>(ICAO) TWR,</strong> (Call Sign) RWY_ airborne 1.000 ft.</span>
+    </div>
+    <div class="atc-call">
+      <span class="num">7</span>
+      <span class="txt"><strong>(ICAO) DEP,</strong> Good day (Call Sign) climbing *INTL CLMB_.</span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ HUD</span><span class="row-state">STOW</span></span></button></li>
+    </ul>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="after-takeoff">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="after-takeoff">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#climb">↓ Nächste Checkliste - 08 Climb</a>
+  </div>
+</section>
+
+<!-- 08 CLIMB -->
+<section class="checklist-item" id="climb">
+  <div class="wrap">
+    <p class="eyebrow">08 — Climb</p>
+    <h2>Climb</h2>
+    <p class="item-desc">Steigflug — PFD-Range anpassen und beim Passieren von 10.000 ft
+       umkonfigurieren.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">PFD Range</span><span class="row-state">40</span></span></button></li>
+    </ul>
+
+    <h3 class="block-title">Passing 10.000 ft</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Landing / Runway Lights</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Altimeter / Standby Instrument</span><span class="row-state">STD</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">8</span>
+      <span class="txt"><strong>(City) CTR,</strong> Good day (Call Sign) inbound_ / _ ft.</span>
+    </div>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="climb">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="climb">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#cruise">↓ Nächste Checkliste - 09 Cruise</a>
+  </div>
+</section>
+
+<!-- 09 CRUISE -->
+<section class="checklist-item" id="cruise">
+  <div class="wrap">
+    <p class="eyebrow">09 — Cruise</p>
+    <h2>Cruise</h2>
+    <p class="item-desc">Reiseflug — Anti-Ice und Seatbelt-Zeichen je nach Bedarf.</p>
+
+    <div class="proc-back">
+    <div class="atc-call">
+      <span class="num">9</span>
+      <span class="txt"><strong>(City) CTR,</strong> Good day (Call Sign) inbound_ / FL_.</span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Wing / Eng Anti-Ice</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Seat Belts</span><span class="row-state">AUTO</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Eng Start</span><span class="row-state">OFF</span></span></button></li>
+    </ul>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="cruise">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="cruise">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#descend">↓ Nächste Checkliste - 10 Descend</a>
+  </div>
+</section>
+
+<!-- 10 DESCEND -->
+<section class="checklist-item" id="descend">
+  <div class="wrap">
+    <p class="eyebrow">10 — Descend</p>
+    <h2>Descend</h2>
+    <p class="item-desc">Sinkflug Vorbereitung — gestaffelt nach Entfernung zum Top of Descent (TOD)
+       und Höhe.</p>
+
+    <div class="proc-back">
+    <h3 class="block-title">Before TOD 100 NM</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">ATIS / METAR</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* Arr Information</span><span class="row-state">OFP</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Legs: No Disconnect</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Nav Data</span><span class="row-state">CHECK</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Fix Info</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* Appr Ref</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Des Forcast</span><span class="row-state">REQUEST / LOAD</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* Baro [DA], or Radio [RA (xxx)] (MCP)</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">WX / Terr (MCP)</span><span class="row-state">AS REQ</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Course / RWY HDG / Landing Alt (MCP)</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Ovhd Land Alt</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Brief Hold Pattern Procedures</span><span class="row-state">NOTE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Brief Go Around Procedure</span><span class="row-state">NOTE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Navigraph Chart: Brief Taxi to Gate_</span><span class="row-state">EFB</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Auto Brk Ext via_</span><span class="row-state">SET</span></span></button></li>
+    </ul>
+
+    <h3 class="block-title">Before TOD 10 NM</h3>
+    <div class="atc-call">
+      <span class="num">10</span>
+      <span class="txt">
+        <strong>(City) CTR,</strong> (Call Sign) ready for descent.
+        <em>except [STAR]_ arrival / with _TRANS / RWY_.</em>
+      </span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">★ Wing / Eng Anti-Ice</span><span class="row-state">AS REQ</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">QRC Checklist</span><span class="row-state">COMPLETE</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ Navigraph Chart: Display Taxi to Gate_</span><span class="row-state">EFB</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Seat Belts</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Nav Panel: RWY ILS</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Altimeter / Standby Instrument</span><span class="row-state">SET</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">11</span>
+      <span class="txt">
+        <strong>(ICAO) APP,</strong> Good day (Call Sign) Information_.
+        <em>except RWY_ / with _TRANS / Altimeter_.</em>
+        <em>OR expect radar vectors for RWY_.</em>
+      </span>
+    </div>
+
+    <h3 class="block-title">Below 10.000 ft</h3>
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Landing / RWY Lights</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Eng Start</span><span class="row-state">CONT</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">PFD Range</span><span class="row-state">20</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Appr</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Traffic</span><span class="row-state">CLEAR</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cabin Crew</span><span class="row-state">ADVISE</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">12</span>
+      <span class="txt"><strong>(ICAO) APP,</strong> (Call Sign) established RWY_.</span>
+    </div>
+
+    <div class="proc-notes">
+      <ul>
+        <li>Anflugzuweisung kann sich ändern — Baro immer erneut prüfen</li>
+        <li>VAPP-Zuschlag: min. 5 kt normal, oder (Böen-Wind) ÷ 2 (max. 15 kt)</li>
+      </ul>
+    </div>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="descend">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="descend">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#before-landing">↓ Nächste Checkliste - 11 Before Landing</a>
+  </div>
+</section>
+
+<!-- 11 BEFORE LANDING -->
+<section class="checklist-item" id="before-landing">
+  <div class="wrap">
+    <p class="eyebrow">11 — Before Landing</p>
+    <h2>Before Landing</h2>
+    <p class="item-desc">Vor der Landung — Fahrwerk, Go-Around-Setup und Landefreigabe.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Landing Gear (2.500 ft)</span><span class="row-state">DOWN</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ HUD / Brit</span><span class="row-state">DEPLOY / 5%</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Go Around HDG (MCP)</span><span class="row-state">SET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Go Around Alt (MCP)</span><span class="row-state">SET</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">13</span>
+      <span class="txt"><strong>(ICAO) TWR,</strong> Good day (Call Sign) RWY_, or GO AROUND</span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Flight Control Replay</span><span class="row-state">AS REQ</span></span></button></li>
+    </ul>
+
+    <div class="proc-notes">
+      <ul>
+        <li>A/P OFF bei 1.000 ft für stabiles Handling — bei schlechter Sicht/Wetter eingeschaltet
+            lassen</li>
+        <li>-700: Flare @ 20 ft — VS -100 und Idle in 2 Sek.</li>
+      </ul>
+    </div>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="before-landing">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="before-landing">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#after-landing">↓ Nächste Checkliste - 12 After Landing</a>
+  </div>
+</section>
+
+<!-- 12 AFTER LANDING -->
+<section class="checklist-item" id="after-landing">
+  <div class="wrap">
+    <p class="eyebrow">12 — After Landing</p>
+    <h2>After Landing</h2>
+    <p class="item-desc">Nach der Landung — Runway verlassen und zum Gate rollen.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Auto Brk / Rev (below 70 kt)</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">^ HUD</span><span class="row-state">STOW</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">14</span>
+      <span class="txt"><strong>(ICAO) TWR,</strong> (Call Sign) vacated RWY_, holding point_.</span>
+    </div>
+    <div class="atc-call">
+      <span class="num">15</span>
+      <span class="txt">
+        <strong>(ICAO) GND,</strong> Good day (Call Sign) holding point_, request taxi to gate.
+        <em>taxi to gate_ OR ramp_ / via_.</em>
+      </span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* Flps</span><span class="row-state">ZERO</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Speed Brake</span><span class="row-state">RET</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">APU</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Eng Start</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Landing / Runway Lights</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Taxi Light</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Position Light</span><span class="row-state">STEADY</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Chrono</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">TCAS</span><span class="row-state">STBY</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">WX / Terr</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">APU Gen / Bleed</span><span class="row-state">ON</span></span></button></li>
+    </ul>
+
+    <div class="proc-notes">
+      <ul>
+        <li>Flaps &lt; 10 °C → oben halten bis Gate, &gt; 10 °C → einfahren</li>
+      </ul>
+    </div>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="after-landing">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="after-landing">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#parking-shutdown">↓ Nächste Checkliste - 13 Parking - Shutdown</a>
+  </div>
+</section>
+
+<!-- 13 PARKING - SHUTDOWN -->
+<section class="checklist-item" id="parking-shutdown">
+  <div class="wrap">
+    <p class="eyebrow">13 — Parking - Shutdown</p>
+    <h2>Parking - Shutdown</h2>
+    <p class="item-desc">Parken am Gate und Triebwerke abstellen.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Taxi Light (before entering Gate)</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Parking Brake</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Engines</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Anti Collision Light</span><span class="row-state">OFF</span></span></button></li>
+    </ul>
+
+    <div class="atc-call">
+      <span class="num">16</span>
+      <span class="txt"><strong>(ICAO) GND,</strong> (Call Sign) on block.</span>
+    </div>
+
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Dome</span><span class="row-state">DIM</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Service Interphone</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Chocks / GPU</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">External Power</span><span class="row-state">ON</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Seat Belts</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">De-Boarding / Cgo Unloading (GSX)</span><span class="row-state">REQUEST</span></span></button></li>
+    </ul>
+
+    <div class="proc-notes">
+      <ul>
+        <li>Externe Stromversorgung nicht abschalten, bevor die APU 0 % erreicht hat</li>
+      </ul>
+    </div>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="parking-shutdown">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="parking-shutdown">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+    <a>&nbsp;</a>
+    <a class="back-to-top" href="#secure-aircraft">↓ Nächste Checkliste - 14 Secure Aircraft</a>
+  </div>
+</section>
+
+<!-- 14 SECURE AIRCRAFT -->
+<section class="checklist-item" id="secure-aircraft" style="border-bottom:none;">
+  <div class="wrap">
+    <p class="eyebrow">14 — Secure Aircraft</p>
+    <h2>Secure Aircraft</h2>
+    <p class="item-desc">Flugzeug final sichern — alle Systeme abschalten.</p>
+
+    <div class="proc-back">
+    <ul class="check-list">
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">APU Bleed / APU</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Yaw Damper</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Fuel Pumps</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">IRS</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Service Interphone</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Emer Lights</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Window Heat / Probe</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Wing / Eng Anti-Ice</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Hyd Pumps</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Packs</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Logo / Position Lights</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Cab / Util or Galley / IFE / Pass Seats</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">Dome</span><span class="row-state">OFF</span></span></button></li>
+      <li><button type="button" class="check-row"><span class="box"></span><span class="row-text"><span class="row-item">* Battery / External Power</span><span class="row-state">OFF</span></span></button></li>
+    </ul>
+    </div>
+
+    <div class="section-toolbar">
+      <button type="button" class="btn-sm" data-mark-all="secure-aircraft">✓ Alle markieren</button>
+      <button type="button" class="btn-sm" data-reset="secure-aircraft">↺ Zurücksetzen</button>
+    </div>
+
+    <a class="back-to-top" href="#top">↑ Zurück zur Übersicht</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <a class="brand" href="index.html">
+        <img src="Logo_raw_new.png" alt="">
+        <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+      </a>
+      <p class="foot-note">Alle Inhalte sind vereinfacht und ausschließlich für die private
+         Flugsimulation aufbereitet. Kein Bezug zu realen Betriebsverfahren oder offiziellen
+         Herstellerunterlagen.</p>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Flight Sim &amp; COFFEE</span>
+      <span>Nur für private Nutzung</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var STORAGE_PREFIX = 'b737-checklist:';
+
+    function safeGet(key){
+      try{ return localStorage.getItem(key); }catch(e){ return null; }
+    }
+    function safeSet(key, val){
+      try{ localStorage.setItem(key, val); }catch(e){}
+    }
+    function safeRemove(key){
+      try{ localStorage.removeItem(key); }catch(e){}
+    }
+
+    var sections = document.querySelectorAll('.checklist-item[id]');
+    sections.forEach(function(section){
+      var rows = section.querySelectorAll('.check-row');
+      rows.forEach(function(row, i){
+        var key = STORAGE_PREFIX + section.id + ':' + i;
+        row.dataset.key = key;
+        if (safeGet(key) === '1'){ row.classList.add('done'); }
+
+        row.addEventListener('click', function(){
+          row.classList.toggle('done');
+          if (row.classList.contains('done')){ safeSet(key, '1'); }
+          else { safeRemove(key); }
+        });
+
+        /* ---------- Keyboard shortcuts ----------
+           Enter  -> Haken setzen und zum nächsten Punkt springen
+           Backspace -> Haken auf dem aktuellen Punkt entfernen
+        */
+        row.addEventListener('keydown', function(e){
+          if (e.key === 'Enter'){
+            e.preventDefault();
+            row.classList.add('done');
+            safeSet(key, '1');
+
+            var next = rows[i + 1];
+            if (next){ next.focus(); }
+          } else if (e.key === 'Backspace' || e.key === 'Delete'){
+            e.preventDefault();
+            row.classList.remove('done');
+            safeRemove(key);
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-mark-all]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var section = document.getElementById(btn.getAttribute('data-mark-all'));
+        if (!section) return;
+        section.querySelectorAll('.check-row').forEach(function(row){
+          row.classList.add('done');
+          safeSet(row.dataset.key, '1');
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-reset]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var section = document.getElementById(btn.getAttribute('data-reset'));
+        if (!section) return;
+        section.querySelectorAll('.check-row').forEach(function(row){
+          row.classList.remove('done');
+          safeRemove(row.dataset.key);
+        });
+      });
+    });
+
+    /* ---------- Show only the selected checklist ---------- */
+    var sectionIds = Array.prototype.map.call(sections, function(s){ return s.id; });
+    var tocButtons = document.querySelectorAll('.cl-toc-btn');
+
+    function showSection(id){
+      sections.forEach(function(s){
+        s.classList.toggle('is-visible', s.id === id);
+      });
+      tocButtons.forEach(function(btn){
+        btn.classList.toggle('is-active', btn.getAttribute('href') === '#' + id);
+      });
+    }
+
+    function activateFromHash(){
+      var hash = window.location.hash.replace('#', '');
+      if (sectionIds.indexOf(hash) !== -1){
+        showSection(hash);
+        var target = document.getElementById(hash);
+        if (target){
+          window.requestAnimationFrame(function(){
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }
+      }
+    }
+
+    window.addEventListener('hashchange', activateFromHash);
+
+    var initialHash = window.location.hash.replace('#', '');
+    showSection(sectionIds.indexOf(initialHash) !== -1 ? initialHash : sectionIds[0]);
+  })();
+</script>
+
+</body>
+</html>

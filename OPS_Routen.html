@@ -12,6 +12,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="site.css">
 
+<!-- Leaflet CSS & JS für die interaktive Karte -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <style>
   /* ---------- Page header ---------- */
   .page-hero{
@@ -52,17 +56,80 @@
   .picker-label{
     font-size: 0.85rem; font-weight: 600; color: var(--text-soft); margin-bottom: 1rem;
   }
-  .airline-grid{
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 0.9rem;
-  }
+  
+  /* ---------- Airline picker (Einzeilig & Scroll-Buttons) ---------- */
+.picker-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.picker-header-row .picker-label {
+  margin-bottom: 0;
+}
+
+.carousel-nav-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.carousel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 5px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.carousel-btn:hover:not(:disabled) {
+  border-color: var(--brass-dark);
+  background: var(--paper-dim);
+  color: var(--brass-dark);
+}
+
+.carousel-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Kacheln auf eine Zeile beschränken */
+.airline-grid {
+  display: flex;
+  gap: 0.9rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  /* Scrollbalken dezent verstecken */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  padding-block: 0.3rem 0.6rem; /* Verhindert Abschneiden der Hover-Schatten */
+}
+
+.airline-grid::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* Feste Breite pro Kachel, damit sie in einer Zeile bleiben */
+.airline-card,
+.airline-skeleton {
+  flex: 0 0 160px;
+  min-width: 160px;
+}
+
+
   .airline-card{
     position: relative;
     display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
     padding: 1.2rem 0.8rem 1rem;
     background: #fff;
     border: 1.5px solid var(--line);
+    border-radius: 10px;
     cursor: pointer;
     text-align: center;
     transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
@@ -73,6 +140,7 @@
   .airline-card.active{
     border-color: var(--brass-dark);
     box-shadow: 0 0 0 1px var(--brass-dark);
+    background: #d6bd9e;
   }
   .airline-card.active::after{
     content: "✓";
@@ -117,11 +185,19 @@
   @keyframes shimmer{ 0%{ background-position: 200% 0; } 100%{ background-position: -200% 0; } }
 
   /* ---------- Filter bar ---------- */
-  .filter-section{
-    padding-block: clamp(1.6rem, 3vw, 2.2rem);
+  .filter-section {
+    padding-block: 0.65rem; /* Sehr schlank im eingeklappten Zustand */
     border-bottom: 1px solid var(--line);
     background: var(--paper-dim);
+    transition: padding-block 0.2s ease;
   }
+
+  /* Mehr Freiraum nur wenn die Filter ausgeklappt sind */
+  .filter-section.is-open {
+    padding-block: 1.2rem clamp(1.4rem, 2.5vw, 1.8rem);
+  }
+
+  
   .filter-row{
     display: flex; flex-wrap: wrap; gap: 1.6rem 2.2rem;
     align-items: flex-start;
@@ -140,15 +216,15 @@
     background: #fff;
     color: var(--text);
     cursor: pointer;
-    border-radius: 999px;
+    border-radius: 2px;
     transition: all 0.15s ease;
     white-space: nowrap;
   }
   .fchip:hover{ border-color: var(--brass-dark); }
   .fchip.active{
-    background: var(--ink);
+    background: #d6bd9e;
     border-color: var(--ink);
-    color: #fff;
+    /*color: #fff;*/
   }
   .search-wrap{ position: relative; min-width: 220px; }
   .search-wrap input{
@@ -182,6 +258,43 @@
     padding: 0.55rem 0;
   }
 
+  /* Toggle-Button für den Filter */
+  .filter-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 1rem;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .filter-toggle-btn:hover {
+    border-color: var(--brass-dark);
+    background: var(--paper-dim);
+    color: var(--brass-dark);
+  }
+  .filter-toggle-btn svg {
+    transition: transform 0.2s ease;
+  }
+  .filter-toggle-btn.is-open svg.chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Filter-Container ein-/ausblenden */
+  .filter-content {
+    display: none;
+    margin-top: 1.2rem;
+  }
+  .filter-content.is-open {
+    display: block;
+  }
+
+
   /* ---------- Stats bar ---------- */
   .stats-bar{
     display: flex; flex-wrap: wrap; gap: 1.6rem;
@@ -192,7 +305,12 @@
   .stats-bar strong{ color: var(--ink); font-family: var(--font-display); }
 
   /* ---------- Results ---------- */
-  .results-section{ padding-block: clamp(1rem, 3vw, 1.6rem) clamp(3rem, 6vw, 4.5rem); }
+  .results-section { 
+  padding-block: clamp(1rem, 3vw, 1.6rem) clamp(3rem, 6vw, 4.5rem);
+  position: relative;
+  width: 100%;
+  left: 0;
+  }
 
   .base-group{ margin-bottom: 2.4rem; }
   .base-group-header{
@@ -217,19 +335,53 @@
     color: var(--text-soft);
   }
 
-  .route-list{ display: flex; flex-direction: column; gap: 0.6rem; }
+  .route-list{ 
+  display: grid; 
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 1rem; 
+  align-items: start;
+}
 
-  .route-row{
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.9rem 1.1rem;
-    background: #fff;
-    border: 1px solid var(--line);
-    transition: box-shadow 0.15s ease, border-color 0.15s ease;
-  }
-  .route-row:hover{ border-color: var(--brass-dark); box-shadow: 0 10px 24px -18px rgba(23,27,38,0.4); }
+  .route-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  /*background: #fff;*/
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  /* 1. Transparenz: Ein halbtransparenter weißer Filter (0.7 = 70% deckend weiß) */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.562)), url('BG_Route.png');
+
+  /* 2. Größe des Bildes */
+  background-size: cover; 
+  
+  /* 3. Position des Bildes */
+  background-position: center center; 
+  
+  /* Verhindert, dass das Bild mehrfach aneinandergereiht wird */
+  background-repeat: no-repeat;
+}
+
+  .route-row:hover{ 
+    border-color: var(--brass-dark); 
+    box-shadow: 0 10px 24px -18px rgba(23,27,38,0.4); 
+    /* 1. Transparenz: Ein halbtransparenter weißer Filter (0.7 = 70% deckend weiß) */
+  background-image: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.685)), url('BG_Route.png');
+
+  /* 2. Größe des Bildes */
+  background-size: cover; 
+  
+  /* 3. Position des Bildes */
+  background-position: center center; 
+  
+  /* Verhindert, dass das Bild mehrfach aneinandergereiht wird */
+  background-repeat: no-repeat;}
 
   .rr-endpoint{
     display: flex; flex-direction: column; align-items: center;
@@ -238,7 +390,7 @@
   .rr-endpoint .code{
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1.2rem;
     color: var(--ink);
   }
   .rr-endpoint .sub{ font-size: 0.68rem; color: var(--text-soft); margin-top: 0.15rem; }
@@ -264,7 +416,7 @@
   }
   .rr-meta{
     display: flex; gap: 0.5rem; align-items: center;
-    font-size: 0.74rem; color: var(--text-soft);
+    font-size: 0.8rem; color: var(--text-soft);
     flex-wrap: wrap; justify-content: center;
     text-align: center;
   }
@@ -309,10 +461,22 @@
     font-size: 0.85em;
   }
 
-  @media (max-width: 720px){
-    .route-row{ grid-template-columns: 1fr; text-align: center; }
-    .rr-right{ align-items: center; text-align: center; flex-direction: row; justify-content: center; }
-    .filter-row{ flex-direction: column; gap: 1.2rem; }
+  #mapWrap {
+  grid-column: 1 / -1; /* Spanne über alle Spalten der Zeile */
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--line);
+  width: 100%;
+  box-sizing: border-box;
+  cursor: default; /* Verhindert den Hand-Cursor über der Karte */
+}
+
+
+  @media (max-width: 900px) {
+  .route-list {
+    grid-template-columns: 1fr;
+  }
+    
   }
 </style>
 </head>
@@ -359,7 +523,22 @@
 
 <!-- AIRLINE PICKER -->
 <div class="wrap airline-picker">
-  <p class="picker-label">1 — Airline wählen</p>
+  <div class="picker-header-row">
+    <p class="picker-label">1 — Airline wählen</p>
+    <div class="carousel-nav-buttons">
+      <button type="button" class="carousel-btn" id="btnScrollLeft" aria-label="Nach links scrollen" title="Zurück">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button type="button" class="carousel-btn" id="btnScrollRight" aria-label="Nach rechts scrollen" title="Weiter">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
   <div class="airline-grid" id="airlineGrid">
     <div class="airline-skeleton"></div>
     <div class="airline-skeleton"></div>
@@ -368,59 +547,65 @@
   </div>
 </div>
 
+
 <!-- FILTER BAR -->
 <div class="filter-section">
   <div class="wrap">
-    <p class="picker-label" style="margin-bottom:1.1rem;">2 — Filtern &amp; sortieren</p>
-    <div class="filter-row">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <p class="picker-label" style="margin-bottom:0;">2 — Filtern &amp; sortieren</p>
+      
+      <button type="button" class="filter-toggle-btn" id="btnToggleFilters" aria-expanded="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        <span id="filterToggleText">Filter einblenden</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
+    </div>
 
-      <div class="filter-group">
-        <span class="filter-group-label">Base</span>
-        <div class="chipset" id="baseChips"></div>
-      </div>
+    <!-- Versteckter Filter-Bereich -->
+    <div class="filter-content" id="filterContent">
+      <div class="filter-row">
 
-      <div class="filter-group">
-        <span class="filter-group-label">Reichweite</span>
-        <div class="chipset" id="rangeChips">
-          <button type="button" class="fchip" data-range="short">Kurzstrecke &lt; 1.200 NM</button>
-          <button type="button" class="fchip" data-range="medium">Mittelstrecke 1.200–3.000 NM</button>
-          <button type="button" class="fchip" data-range="long">Langstrecke ≥ 3.000 NM</button>
+        <div class="filter-group">
+          <span class="filter-group-label">Base</span>
+          <div class="chipset" id="baseChips"></div>
         </div>
-      </div>
 
-      <div class="filter-group">
-        <span class="filter-group-label">Flugzeug</span>
-        <div class="chipset" id="aircraftChips"></div>
-      </div>
-
-      <div class="filter-group">
-        <span class="filter-group-label">Suche</span>
-        <div class="search-wrap">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-          <input type="text" id="searchInput" placeholder="Ziel, Land, ICAO, IATA…">
+        <div class="filter-group">
+          <span class="filter-group-label">Reichweite</span>
+          <div class="chipset" id="rangeChips">
+            <button type="button" class="fchip" data-range="short">Kurzstrecke &lt; 1.200 NM</button>
+            <button type="button" class="fchip" data-range="medium">Mittelstrecke 1.200–3.000 NM</button>
+            <button type="button" class="fchip" data-range="long">Langstrecke ≥ 3.000 NM</button>
+          </div>
         </div>
-      </div>
 
-      <div class="filter-group">
-        <span class="filter-group-label">Sortierung</span>
-        <select class="sort-select" id="sortSelect">
-          <option value="base-asc">Base (A–Z)</option>
-          <option value="dist-asc">Entfernung (aufsteigend)</option>
-          <option value="dist-desc">Entfernung (absteigend)</option>
-          <option value="dest-asc">Ziel (A–Z)</option>
-        </select>
-      </div>
+        <div class="filter-group">
+          <span class="filter-group-label">Flugzeug</span>
+          <div class="chipset" id="aircraftChips"></div>
+        </div>
 
-      <button type="button" class="filter-reset" id="resetFilters">Filter zurücksetzen</button>
+        <button type="button" class="filter-reset" id="resetFilters">Filter zurücksetzen</button>
+      </div>
     </div>
   </div>
 </div>
 
+
 <!-- RESULTS -->
 <section class="results-section">
   <div class="wrap">
+    <!-- Map Container -->
+<div id="mapWrap" style="display: none;">
+  <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 0.8rem;">
+    <button type="button" id="closeMapBtn" style="background: none; border: 1px solid var(--line); padding: 0.25rem 0.6rem; cursor: pointer; font-size: 0.8rem; font-family: inherit;">Karte schließen ✕</button>
+  </div>
+  <div id="map" style="height: 400px; width: 100%; border: 1px solid var(--line);"></div>
+</div>
+
     <div class="stats-bar" id="statsBar"></div>
     <div id="resultsContainer"></div>
   </div>
@@ -447,40 +632,122 @@
 </footer>
 
 <script>
-  // ============================================================
-  // DATENQUELLE
-  // Die Routen werden zur Laufzeit aus Airlines_Routen.html geladen
-  // (per fetch). Diese Datei muss im selben Ordner liegen wie diese
-  // Seite. Neue Airline hinzufügen = einfach weitere Zeilen mit dem
-  // Airline-Namen in der Tabelle in Airlines_Routen.html ergänzen —
-  // an dieser Seite muss nichts geändert werden.
-  //
-  // Tabellenspalten (in dieser Reihenfolge, wie von LibreOffice/Excel
-  // exportiert): Airline | Base | Zielort (Land) | ICAO-Code (IATA) |
-  // Flugtage (Wochentage) | Entfernung (ca. NM) | Standard-Flugzeugtyp
-  // ============================================================
   const DATA_URL = 'Airlines_Routen.html';
 
-  // Bekannte Airlines: feste Farbe/Logo/Initialen. Für jede Airline,
-  // die hier NICHT gelistet ist, aber in der Tabelle auftaucht, wird
-  // automatisch eine Farbe + Initialen-Badge erzeugt (siehe metaFor()).
-  // Logo-Konvention: <slug>.png im selben Ordner wie diese Seite —
-  // Datei einfach dort ablegen, sie wird automatisch verwendet, sobald
-  // sie existiert.
-  const AIRLINE_META = {
-    'Condor':            { color: '#F5A300', text: '#1a1a1a', initials: 'CD'},
-    'Lufthansa':         { color: '#05164D', text: '#ffffff', initials: 'LH'},
-    'EasyJet':           { color: '#FF6600', text: '#ffffff', initials: 'EJ'},
-    'Eurowings':         { color: '#5B2A86', text: '#ffffff', initials: 'EW'},
-    'Discover Airlines': { color: '#00A19B', text: '#ffffff', initials: '4Y'},
-    'Sundair':           { color: '#FDB813', text: '#1a1a1a', initials: 'SR'},
-    'Vueling':           { color: '#FFCD00', text: '#1a1a1a', initials: 'VY'},
-    'Transavia':         { color: '#00A651', text: '#ffffff', initials: 'HV'},
-    'United Airlines':   { color: '#0032A0', text: '#ffffff', initials: 'UA'},
-    'Emirates':          { color: '#D71921', text: '#ffffff', initials: 'EK'}
+  // Integrierte GPS-Datenbank für alle vertretenen Flughäfen (ICAO -> [Lat, Lng])
+  const AIRPORT_COORDS = {
+    'EDDF': [50.0333, 8.5705],   // Frankfurt
+    'EDDL': [51.2895, 6.7668],   // Düsseldorf
+    'EDDM': [48.3538, 11.7861],  // München
+    'EDDH': [53.6304, 9.9882],   // Hamburg
+    'EDDS': [48.6899, 9.2220],   // Stuttgart
+    'EDDB': [52.3667, 13.5033],  // Berlin
+    'EDDW': [53.0475, 8.7867],   // Bremen
+    'EDDC': [51.1328, 13.7672],  // Dresden
+    'EDVK': [51.4083, 9.3778],   // Kassel-Calden
+    'EDHL': [53.8053, 10.7192],  // Lübeck
+    'EDDK': [50.8659, 7.1427],   // Köln/Bonn
+    'EDLW': [51.5183, 7.6122],   // Dortmund
+    'EDJA': [47.9888, 10.2395],  // Memmingen
+    'LEPA': [39.5517, 2.7388],   // Palma de Mallorca
+    'LGIR': [35.3397, 25.1803],  // Heraklion
+    'GCTS': [28.0444, -16.5725], // Teneriffa Süd
+    'HEGN': [27.1814, 33.7994],  // Hurghada
+    'LPMA': [32.6978, -16.7744], // Funchal / Madeira
+    'KJFK': [40.6398, -73.7789], // New York JFK
+    'KEWR': [40.6925, -74.1686], // Newark
+    'MMUN': [21.0365, -86.8771], // Cancun
+    'MDPC': [18.5674, -68.3634], // Punta Cana
+    'VTBS': [13.6925, 100.7501], // Bangkok
+    'FIMP': [-20.4302, 57.6836], // Mauritius
+    'KLAX': [33.9425, -118.4081],// Los Angeles
+    'GCLP': [27.9319, -15.3866], // Gran Canaria
+    'LGRP': [36.4054, 28.0862],  // Rhodos
+    'GCFV': [28.4527, -13.8638], // Fuerteventura
+    'LGKR': [39.6019, 19.9117],  // Korfu
+    'OMDB': [25.2528, 55.3644],  // Dubai
+    'LOWW': [48.1103, 16.5697],  // Wien
+    'LSZH': [47.4581, 8.5554],   // Zürich
+    'LEMD': [40.4719, -3.5626],  // Madrid
+    'LEBL': [41.2971, 2.0785],   // Barcelona
+    'LFPG': [49.0097, 2.5478],   // Paris CDG
+    'EGLL': [51.4706, -0.4619],  // London Heathrow
+    'LIRF': [41.8003, 12.2389],  // Rom Fiumicino
+    'LIMC': [45.6306, 8.7281],   // Mailand Malpensa
+    'ESSA': [59.6519, 17.9186],  // Stockholm
+    'EKCH': [55.6180, 12.6560],  // Kopenhagen
+    'EHAM': [52.3086, 4.7639],   // Amsterdam
+    'LGAV': [37.9364, 23.9445],  // Athen
+    'LPPT': [38.7756, -9.1354],  // Lissabon
+    'KSFO': [37.6189, -122.3750],// San Francisco
+    'KMIA': [25.7933, -80.2906], // Miami
+    'RJTT': [35.5523, 139.7798], // Tokio Haneda
+    'WSSS': [1.3502, 103.9944],  // Singapur
+    'FAOR': [-26.1392, 28.2460], // Johannesburg
+    'SAEZ': [-34.8222, -58.5358],// Buenos Aires
+    'SBGR': [-23.4356, -46.4731],// Sao Paulo
+    'EGKK': [51.1481, -0.1903],  // London Gatwick
+    'EGGW': [51.8747, -0.3683],  // London Luton
+    'LFPO': [48.7233, 2.3794],   // Paris Orly
+    'LIPZ': [45.5053, 12.3519],  // Venedig
+    'LIRN': [40.8860, 14.2908],  // Neapel
+    'LSGG': [46.2381, 6.1089],   // Genf
+    'LEIB': [38.8729, 1.3731],   // Ibiza
+    'LEMG': [36.6749, -4.4991],  // Malaga
+    'LGTS': [40.5197, 22.9709],  // Thessaloniki
+    'LDSP': [43.5389, 16.2980],  // Split
+    'LIEO': [40.8986, 9.5176],   // Olbia
+    'LICC': [37.4668, 15.0664],  // Catania
+    'FYWH': [-22.4799, 17.4709], // Windhoek
+    'KTPA': [27.9755, -82.5332], // Tampa
+    'LTAI': [36.8987, 30.8005],  // Antalya
+    'LBWN': [43.2322, 27.8251],  // Varna
+    'LEZL': [37.4180, -5.8931],  // Sevilla
+    'LEAL': [38.2822, -0.5582],  // Alicante
+    'LPFR': [37.0144, -7.9659],  // Faro
+    'LFMN': [43.6584, 7.2159],   // Nizza
+    'LOWI': [47.2602, 11.3440],  // Innsbruck
+    'EHEH': [51.4500, 5.3745],   // Eindhoven
+    'EHRD': [51.9569, 4.4372],   // Rotterdam
+    'KORD': [41.9786, -87.9048], // Chicago
+    'KIAD': [38.9445, -77.4558], // Washington Dulles
+    'EVRA': [56.9236, 23.9711],  // Riga
+    'EETN': [59.4133, 24.8328],  // Tallinn
+    'LHBP': [47.4369, 19.2556],  // Budapest
+    'EPKT': [50.4742, 19.0800],  // Katowice
+    'LROP': [44.5722, 26.1022],  // Bukarest
+    'LBSF': [42.6952, 23.4061],  // Sofia
+    'EPWA': [52.1657, 20.9671],  // Warschau
+    'BIKF': [63.9850, -22.6056], // Keflavik
+    'LIME': [45.6739, 9.7042],   // Mailand Bergamo
+    'CYYZ': [43.6777, -79.6248], // Toronto
+    'RJAA': [35.7647, 140.3863], // Tokio Narita
+    'RKSI': [37.4691, 126.4505], // Seoul Incheon
+    'LKPR': [50.1008, 14.2600],  // Prag
+    'LGKO': [36.7933, 27.0917]   // Kos
   };
 
-  const FALLBACK_PALETTE = ['#2E5EAA', '#B23A48', '#3E7C59', '#8B5E3C', '#4A4E9E', '#C4742D', '#1F7A8C', '#96562D'];
+  const AIRLINE_META = {
+    'Condor':            { color: '#171b26', text: '#fff', initials: 'CFG'},
+    'Lufthansa':         { color: '#171b26', text: '#fff', initials: 'DLH'},
+    'EasyJet':           { color: '#171b26', text: '#fff', initials: 'EZY'},
+    'Eurowings':         { color: '#171b26', text: '#fff', initials: 'EWG'},
+    'Discover Airlines': { color: '#171b26', text: '#fff', initials: 'DRS'},
+    'Sundair':           { color: '#171b26', text: '#fff', initials: 'SDR'},
+    'Vueling':           { color: '#171b26', text: '#fff', initials: 'VLG'},
+    'Transavia':         { color: '#171b26', text: '#fff', initials: 'TRA'},
+    'United Airlines':   { color: '#171b26', text: '#fff', initials: 'UAL'},
+    'Emirates':          { color: '#171b26', text: '#fff', initials: 'UAE'},
+    'airBaltic':         { color: '#171b26', text: '#fff', initials: 'BTI'},
+    'Wizz Air':          { color: '#171b26', text: '#fff', initials: 'WZZ'},
+    'LOT Polish Airlines':          { color: '#171b26', text: '#fff', initials: 'LOT'},
+    'Swiss International':          { color: '#171b26', text: '#fff', initials: 'SWR'}
+  };
+
+  const FALLBACK_PALETTE = ['#171b26'];
+
+  let mapInstance = null;
+  let routeGroup = null;
 
   function slugify(name){
     return name.toLowerCase()
@@ -498,22 +765,19 @@
     const initials = words.length > 1
       ? words.map(w => w[0]).join('').slice(0, 2).toUpperCase()
       : name.slice(0, 2).toUpperCase();
-    return { color, text: '#ffffff', initials};
+    return { color, text: '#fff', initials};
   }
 
-  // "Name (Zusatz)" -> [Name, Zusatz]
   function splitParen(s){
     const m = s.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
     return m ? [m[1].trim(), m[2].trim()] : [s.trim(), ''];
   }
 
-  // "LEPA (PMI)" -> [ICAO, IATA]
   function splitCode(s){
     const m = s.match(/^([A-Za-z0-9]+)\s*\(([A-Za-z0-9]+)\)\s*$/);
     return m ? [m[1], m[2]] : [s.trim(), ''];
   }
 
-  // "1.130 NM" -> 1130
   function parseDistance(s){
     const cleaned = s.replace(/NM/i, '').trim().replace(/\./g, '').replace(/,/g, '.');
     const v = parseFloat(cleaned);
@@ -525,9 +789,6 @@
     if (!res.ok) throw new Error(`${url} antwortete mit Status ${res.status}`);
     const buf = await res.arrayBuffer();
 
-    // Robustes Encoding: Excel/LibreOffice exportiert i. d. R. als
-    // windows-1252. fetch() ignoriert das interne <meta charset>,
-    // deshalb hier explizit dekodieren statt res.text() zu nutzen.
     let text;
     try{
       text = new TextDecoder('windows-1252').decode(buf);
@@ -546,7 +807,7 @@
       const cells = [...tr.querySelectorAll('td')].map(td => td.textContent.replace(/\s+/g, ' ').trim());
       if (cells.length !== 7) return;
       const [airline, baseRaw, destRaw, codeRaw, days, distRaw, aircraft] = cells;
-      if (!airline || airline.toLowerCase() === 'airline') return; // Header-Zeile überspringen
+      if (!airline || airline.toLowerCase() === 'airline') return;
 
       const [base, baseCode] = splitParen(baseRaw);
       const [destination, country] = splitParen(destRaw);
@@ -571,14 +832,12 @@
     return out;
   }
 
-  // Reichweiten-Grenzen (NM)
   const RANGE_BOUNDS = {
     short:  [0, 1199],
     medium: [1200, 2999],
     long:   [3000, Infinity]
   };
 
-  // Flugzeug-Filterfamilien: Label -> Regex, die auf den rohen "aircraft"-String matcht
   const AIRCRAFT_FAMILIES = [
     { label: "A220",     re: /A220/ },
     { label: "A319",     re: /A319/ },
@@ -618,6 +877,8 @@
   const resultsEl       = document.getElementById('resultsContainer');
   const dataStatusEl    = document.getElementById('dataStatus');
   const dataStatusText  = document.getElementById('dataStatusText');
+  const mapWrap         = document.getElementById('mapWrap');
+  const mapTitle        = document.getElementById('mapTitle');
 
   function setStatus(mode, text){
     dataStatusEl.className = 'data-status' + (mode ? ' is-' + mode : '');
@@ -644,7 +905,7 @@
         state.ranges.clear();
         state.aircraft.clear();
         state.search = '';
-        searchInput.value = '';
+        mapWrap.style.display = 'none';
         renderAirlinePicker();
         renderFilters();
         renderResults();
@@ -715,22 +976,12 @@
     renderResults();
   });
 
-  searchInput.addEventListener('input', (e) => {
-    state.search = e.target.value.trim().toLowerCase();
-    renderResults();
-  });
-
-  sortSelect.addEventListener('change', (e) => {
-    state.sort = e.target.value;
-    renderResults();
-  });
 
   document.getElementById('resetFilters').addEventListener('click', () => {
     state.bases.clear();
     state.ranges.clear();
     state.aircraft.clear();
     state.search = '';
-    searchInput.value = '';
     renderFilters();
     renderResults();
   });
@@ -830,14 +1081,19 @@
 
   function baseAirportCode(r){
     const parts = r.baseCode.split('/');
-    return (parts[1] ? parts[1].trim() : r.base.slice(0,3).toUpperCase());
+    return (parts[0] ? parts[0].trim() : r.base.slice(0,4).toUpperCase());
   }
 
   function routeRowHTML(r){
+    const baseIcao = baseAirportCode(r);
+    const destIcao = r.icao;
+    const cleanBaseName = r.base.replace(/'/g, "\\'");
+    const cleanDestName = r.destination.replace(/'/g, "\\'");
+
     return `
-      <div class="route-row">
+      <div class="route-row" onclick="selectRoute(this, '${baseIcao}', '${destIcao}', '${cleanBaseName}', '${cleanDestName}')" title="Klicken, um Route auf der Karte anzuzeigen">
         <div class="rr-endpoint">
-          <span class="code">${baseAirportCode(r)}</span>
+          <span class="code">${baseIcao}</span>
           <span class="sub">${r.base}</span>
         </div>
         <div class="rr-flow">
@@ -850,8 +1106,8 @@
           <div class="rr-dest-line">${r.destination} <span class="country">(${r.country})</span></div>
         </div>
         <div class="rr-endpoint">
-          <span class="code">${r.iata}</span>
-          <span class="sub">${r.icao}</span>
+          <span class="code">${r.icao}</span>
+          <span class="sub">${r.destination}</span>
         </div>
         <div class="rr-right" style="grid-column: 1 / -1; justify-self:end; margin-top:-0.4rem;">
           <span class="rr-days">${r.days}</span>
@@ -859,6 +1115,83 @@
       </div>
     `;
   }
+
+  // Klicks IN der Karte sollen die Route nicht versehentlich neu laden/schließen
+  document.getElementById('mapWrap').addEventListener('click', (e) => {
+    e.stopPropagation(); 
+  });
+
+  document.getElementById('closeMapBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    mapWrap.style.display = 'none';
+  });
+
+  // Funktion zur Kartendarstellung bei Routenauswahl
+  function selectRoute(rowElement, baseIcao, destIcao, baseName, destName) {
+    const baseCoords = AIRPORT_COORDS[baseIcao];
+    const destCoords = AIRPORT_COORDS[destIcao];
+
+    if (!baseCoords || !destCoords) {
+      alert(`GPS-Koordinaten für ${!baseCoords ? baseIcao : destIcao} nicht gefunden.`);
+      return;
+    }
+
+    // Karte in das HTML der geklickten Zeile verschieben
+    rowElement.appendChild(mapWrap);
+    
+    mapWrap.style.display = 'block';
+
+    if (!mapInstance) {
+      mapInstance = L.map('map');
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(mapInstance);
+      routeGroup = L.layerGroup().addTo(mapInstance);
+    } else {
+      routeGroup.clearLayers();
+    }
+
+    const baseMarker = L.circleMarker(baseCoords, {
+  radius: 8,           // Größe des Kreises
+  color: '#e04b38;;;',    // Farbe des Randes (passend zu deiner Polyline)
+  weight: 2,           // Dicke des Randes
+  fillColor: 'fff;',// Füllfarbe
+  fillOpacity: 1       // Deckkraft
+}).bindPopup(`<b>${baseName}</b><br>ICAO: ${baseIcao}`);
+
+const destMarker = L.circleMarker(destCoords, {
+  radius: 8,
+  color: '#e04b38;',
+  weight: 2,
+  fillColor: 'fff;',
+  fillOpacity: 1
+}).bindPopup(`<b>${destName}</b><br>ICAO: ${destIcao}`);
+
+    const polyline = L.polyline([baseCoords, destCoords], {
+      color: '#e04b38',
+      weight: 3,
+      opacity: 0.85,
+      dashArray: '6, 6'
+    });
+
+    routeGroup.addLayer(baseMarker);
+    routeGroup.addLayer(destMarker);
+    routeGroup.addLayer(polyline);
+
+    // Wichtig: Da die Karte im DOM verschoben wurde, muss Leaflet die Größe neu berechnen!
+    mapInstance.invalidateSize();
+    mapInstance.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+
+    destMarker.openPopup();
+    
+    // Sanft zur aufgeklappten Zeile scrollen
+    rowElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  document.getElementById('closeMapBtn').addEventListener('click', () => {
+    mapWrap.style.display = 'none';
+  });
 
   function showFatalError(err){
     setStatus('error', 'Streckendaten konnten nicht geladen werden.');
@@ -881,7 +1214,7 @@
       </div>`;
   }
 
-  async function init(){
+    async function init(){
     try{
       AIRLINES = await loadAirlinesFromHTML(DATA_URL);
       const totalRoutes = Object.values(AIRLINES).reduce((s,a) => s + a.routes.length, 0);
@@ -889,10 +1222,62 @@
       renderAirlinePicker();
       renderFilters();
       renderResults();
+      // NEU: Sicherstellen, dass die Buttons den aktuellen Scroll-Bereich kennen
+      if (typeof updateScrollButtons === 'function') {
+        updateScrollButtons();
+      }
     } catch(err){
       showFatalError(err);
     }
   }
+
+
+  // Horizontal-Scroll Steuerung für Airline Picker
+const grid = document.getElementById('airlineGrid');
+const btnLeft = document.getElementById('btnScrollLeft');
+const btnRight = document.getElementById('btnScrollRight');
+
+function updateScrollButtons() {
+  if (!grid || !btnLeft || !btnRight) return;
+  // Deaktivieren, wenn ganz links oder ganz rechts angekommen
+  btnLeft.disabled = grid.scrollLeft <= 5;
+  btnRight.disabled = (grid.scrollLeft + grid.clientWidth) >= (grid.scrollWidth - 5);
+}
+
+// 2 bis 3 Karten pro Klick weiterscrollen
+const scrollDistance = 340;
+
+btnLeft.addEventListener('click', () => {
+  grid.scrollBy({ left: -scrollDistance, behavior: 'smooth' });
+});
+
+btnRight.addEventListener('click', () => {
+  grid.scrollBy({ left: scrollDistance, behavior: 'smooth' });
+});
+
+grid.addEventListener('scroll', updateScrollButtons, { passive: true });
+window.addEventListener('resize', updateScrollButtons);
+
+// Initialen Button-Status prüfen (sobald Airlines geladen sind)
+setTimeout(updateScrollButtons, 200);
+
+  const btnToggleFilters = document.getElementById('btnToggleFilters');
+  const filterSection    = document.querySelector('.filter-section');
+  const filterContent    = document.getElementById('filterContent');
+  const filterToggleText = document.getElementById('filterToggleText');
+
+  if (btnToggleFilters && filterContent) {
+    btnToggleFilters.addEventListener('click', () => {
+      const isOpen = filterContent.classList.toggle('is-open');
+      filterSection.classList.toggle('is-open', isOpen); // <-- steuert die reduzierte / volle Höhe
+      btnToggleFilters.classList.toggle('is-open', isOpen);
+      btnToggleFilters.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      filterToggleText.textContent = isOpen ? 'Filter ausblenden' : 'Filter einblenden';
+    });
+  }
+
+  
+
 
   init();
 </script>

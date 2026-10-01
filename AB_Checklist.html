@@ -56,7 +56,7 @@
   .picker-label{
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--text-soft);
+    color: var(--ink);
     margin-bottom: 1rem;
   }
 
@@ -77,6 +77,7 @@
     font-family: var(--font-body);
     text-align: left;
     transition: border-color 0.2s ease, background 0.2s ease;
+    border-radius: 5px;
   }
 
   .tab:hover{ border-color: var(--brass); }
@@ -173,13 +174,16 @@
 
   .panel-media{
     position: relative;
-    border: 1px solid var(--line);
+    border: 1.5px solid #ac8a6c;
     background: #fff;
+    border-radius: 5px;
   }
 
   .panel-media img{
     width: 100%;
     display: block;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
   }
 
   .panel-media figcaption{
@@ -210,17 +214,20 @@
   .panel-media::before, .panel-media::after{
   content: "";
   position: absolute;
-  width: 22px; height: 22px;
-  border: 2px solid var(--brass);
-  z-index: 2;
+  width: 100px; height: 100px;
+  border: 1.5px solid var(--brass);
+  z-index: 4;
+  border-radius: 5px;
+  border: none;
 }
-.panel-media::before{ top: -1px; left: -1px; border-right: none; border-bottom: none; }
-.panel-media::after{ bottom: -1px; right: -1px; border-left: none; border-top: none; }
+.panel-media::before{ top: -4px; left: -4px; border-right: none; border-bottom: none; }
+.panel-media::after{ bottom: -4px; right: -4px; border-left: none; border-top: none; }
 
   .panel .copy h3{
     font-size: 1.25rem;
     margin-top: 2.2rem;
     margin-bottom: 0.3rem;
+    
   }
 
   .panel-foot{
