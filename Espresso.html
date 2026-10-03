@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espresso — Short Legs &amp; Coffee — Flight Sim &amp; COFFEE</title>
+<meta name="description" content="Espresso-Routen: kurze, anspruchsvolle Flüge für die private Flugsimulation.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+
+<style>
+  /* ---------- Page header ---------- */
+  .page-hero{
+    position: relative;
+    background: var(--ink);
+    color: #fff;
+    padding-block: clamp(2.5rem, 6vw, 4rem) clamp(2rem, 5vw, 3rem);
+    overflow: hidden;
+  }
+  .page-hero::after{
+    content: "";
+    position: absolute; right: 4%; top: 50%;
+    width: clamp(120px, 18vw, 220px); aspect-ratio: 1;
+    transform: translateY(-50%);
+    background: url("Logo_raw_new.png") center / contain no-repeat;
+    opacity: 0.12; pointer-events: none;
+  }
+  .breadcrumb{ display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; font-size:.85rem; color:#9d9688; margin-bottom:1.2rem; }
+  .breadcrumb a{ color:#c9c1b1; text-decoration:none; }
+  .breadcrumb a:hover{ color:var(--brass-light); }
+  .page-hero h1{ color:#fff; font-size:clamp(2rem,4.5vw,3rem); }
+  .page-hero p.lead{ margin-top:.9rem; color:#c9c1b1; max-width:62ch; font-size:clamp(.98rem,1.3vw,1.08rem); }
+  .hero-facts{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1.4rem; }
+  .fact{
+    font-size:.8rem; color:var(--brass-light);
+    border:1px solid rgba(214,189,158,.35); border-radius:999px; padding:.3rem .8rem;
+  }
+
+  /* ---------- Results ---------- */
+  .results{ padding-block:1.6rem 4rem; }
+  .stats-bar{ display:flex; flex-wrap:wrap; gap:1.6rem; padding-block:.4rem 1.2rem; font-size:.85rem; color:var(--text-soft); }
+  .stats-bar strong{ color:var(--ink); font-family:var(--font-display); }
+
+  .route-list{ display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; align-items:start; }
+
+  .route{
+    border:1px solid var(--line); border-radius:10px; cursor:pointer;
+    /* Ebenen: 1) heller Overlay für Lesbarkeit  2) eigenes Routenbild (--bg)  3) Fallback BG_Route.png
+       Fehlt das eigene Bild, zeigt der Browser automatisch den Fallback. */
+    background-image:
+      linear-gradient(rgba(255,255,255,var(--ov-top,.88)), rgba(255,255,255,var(--ov-bottom,.55))),
+      var(--bg, none),
+      url('BG_Route.png');
+    background-size:cover; background-position:center; background-repeat:no-repeat;
+    transition:box-shadow .15s ease, border-color .15s ease;
+    text-align:left; font:inherit; color:inherit; padding:0; width:100%;
+  }
+  .route:hover, .route.open{ --ov-top:.8; --ov-bottom:.4; border-color:var(--brass-dark); box-shadow:0 10px 24px -18px rgba(23,27,38,.4); }
+  .route-main{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:1rem; padding:.9rem 1.1rem; }
+  .rr-endpoint{ display:flex; flex-direction:column; align-items:center; min-width:58px; }
+  .rr-endpoint .code{ font-family:var(--font-display); font-weight:700; font-size:1.2rem; color:var(--ink); }
+  .rr-endpoint .sub{ font-size:.68rem; color:var(--text-soft); margin-top:.15rem; }
+  .rr-flow{ display:flex; flex-direction:column; align-items:center; gap:.25rem; min-width:0; }
+  .rr-line{ position:relative; width:100%; height:1px; background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 11px); margin:.15rem 0; }
+  .rr-line::after{ content:"▸"; position:absolute; right:-2px; top:50%; transform:translateY(-55%); color:var(--brass-dark); font-size:.85rem; }
+  .rr-meta{ display:flex; gap:.5rem; align-items:center; font-size:.8rem; color:var(--text-soft); flex-wrap:wrap; justify-content:center; }
+  .rr-dist{ font-weight:600; color:var(--ink); }
+  .beans{ display:inline-flex; gap:2px; vertical-align:middle; }
+  .bean{ width:9px; height:13px; border-radius:50%; background:rgba(172,138,108,.3); transform:rotate(25deg); }
+  .bean.on{ background:var(--brass-dark); }
+  .rr-right{ display:flex; flex-direction:column; align-items:flex-end; gap:.35rem; text-align:right; min-width:96px; }
+  .tag{ font-size:.72rem; color:var(--brass-dark); background:rgba(224,165,54,.14); padding:.2rem .55rem; border-radius:999px; white-space:nowrap; }
+
+  .route-detail{ display:block; padding:0 1.1rem 1.1rem; border-top:1px dashed var(--line); margin-top:-.1rem; }
+    .detail-title{ font-size:.72rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--brass-dark); margin:.9rem 0 .35rem; }
+  .route-detail p{ margin:0; font-size:.9rem; color:var(--text-soft); }
+  .detail-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; margin-top:.9rem; }
+  .detail-grid div{ background:rgba(255,255,255,.8); border:1px solid var(--line); border-radius:5px; padding:.5rem .7rem; font-size:.78rem; color:var(--text-soft); }
+  .detail-grid b{ display:block; color:var(--ink); font-family:var(--font-display); font-size:.92rem; }
+  .copy-btn{ margin-top:.9rem; }
+  /* Weiße Felder + Button erst nach Klick auf die Route */
+  .route .detail-grid, .route .copy-btn{ display:none; }
+  .route.open .detail-grid{ display:grid; animation:pop .25s ease both; }
+  .route.open .copy-btn{ display:inline-flex; animation:pop .25s ease both; }
+
+  .empty{ padding:3rem 1rem; text-align:center; color:var(--text-soft); grid-column:1/-1; }
+  .note{ margin-top:2rem; font-size:.8rem; color:var(--text-soft); max-width:70ch; }
+
+  @media (max-width:900px){ .route-list{ grid-template-columns:1fr; } }
+  @media (max-width:520px){ .route-main{ grid-template-columns:1fr; justify-items:center; } .rr-right{ align-items:center; } .detail-grid{ grid-template-columns:1fr; } }
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-row">
+    <a class="brand" href="index.html">
+      <img src="Logo_raw_new.png" alt="">
+      <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+    </a>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label" aria-label="Menü öffnen"><span></span><span></span><span></span></label>
+    <ul class="nav-links">
+      <li><a href="index.html#checklisten">Checklisten</a></li>
+      <li><a href="index.html#coffee-flights" aria-current="page">Coffee Flights</a></li>
+      <li><a href="index.html#operations">Flight Ops</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<header class="page-hero" id="top">
+  <div class="wrap">
+    <p class="breadcrumb">
+      <a href="index.html">Start</a> <span>／</span>
+      <a href="index.html#coffee-flights">Coffee Flights</a> <span>／</span>
+      Espresso
+    </p>
+    <h1>Espresso</h1>
+    <p class="lead">Kurz, kräftig, anspruchsvoll. Espresso-Routen sind schnell geflogen — dafür verlangen
+      Gelände, Wetter oder Anflug volle Aufmerksamkeit. Perfekt für einen Flug, solange der Kaffee noch heiß ist.</p>
+    <div class="hero-facts">
+      <span class="fact">meist unter 200 NM</span>
+      <span class="fact">meist unter 45 Min.</span>
+      <span class="fact">Fokus: Anflug &amp; Gelände</span>
+    </div>
+  </div>
+</header>
+
+<!-- RESULTS -->
+<section class="results">
+  <div class="wrap">
+    <div class="stats-bar" id="stats"></div>
+    <div class="route-list" id="list"></div>
+    <p class="note">Prototyp: Beispielrouten mit ungefähren Distanzen und Flugzeiten, vereinfacht und ausschließlich für die private Flugsimulation.
+      Kein Bezug zu realen Betriebsverfahren.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-row">
+      <a class="brand" href="index.html">
+        <img src="Logo_raw_new.png" alt="">
+        <span>FLIGHT<em>SIM</em> &amp; COFFEE</span>
+      </a>
+      <p class="foot-note">Alle Inhalte sind vereinfacht und ausschließlich für die private
+        Flugsimulation aufbereitet. Kein Bezug zu realen Betriebsverfahren oder offiziellen
+        Herstellerunterlagen.</p>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Flight Sim &amp; COFFEE</span>
+      <span>Nur für private Nutzung</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // level: 1 = Ristretto (mild), 2 = Espresso (kräftig), 3 = Doppio (extrem)
+  const ROUTES = [
+    { from:'EDDB', fromCity:'Berlin',   to:'EDDH', toCity:'Hamburg',     nm:140, ac:'A320neo',  level:1, tag:'Einsteiger',
+      challenge:'Entspannter Inlandsflug. Gut zum Einüben von SID/STAR und einem sauberen ILS-Anflug.' },
+    { from:'EDDF', fromCity:'Frankfurt',to:'EDDM', toCity:'München',     nm:165, ac:'A220-300', level:1, tag:'Inland',
+      challenge:'Dichter Luftraum rund um beide Hubs. Übung für Anflugsequenz und Geschwindigkeitsmanagement.' },
+    { from:'LSZH', fromCity:'Zürich',   to:'LSGG', toCity:'Genf',        nm:125, ac:'A220-300', level:1, tag:'Alpenrand',
+      challenge:'Kurzer Hop mit enger Steigflug-/Sinkflug-Planung. Früh sinken, spät konfigurieren.' },
+    { from:'EDDM', fromCity:'München',  to:'LOWI', toCity:'Innsbruck',   nm:85,  ac:'A220-100', level:3, tag:'Talanflug',
+      challenge:'Anflug im engen Inntal mit Bergen auf beiden Seiten, wenig Spielraum und böigem Wind. Stabilisiert und konfiguriert früh sein.' },
+    { from:'LOWS', fromCity:'Salzburg', to:'LOWI', toCity:'Innsbruck',   nm:100, ac:'A220-100', level:3, tag:'Gelände',
+      challenge:'Kurze Strecke über die Alpen. Mindestflughöhen beachten und den Sinkflug im Tal sauber planen.' },
+    { from:'LSZH', fromCity:'Zürich',   to:'LSZS', toCity:'Samedan',     nm:95,  ac:'Turboprop', level:3, tag:'Hochgebirge',
+      challenge:'Eines der höchstgelegenen Flugfelder Europas. Dünne Luft verlängert Start- und Landestrecke deutlich.' },
+    { from:'LEMG', fromCity:'Málaga',   to:'LXGB', toCity:'Gibraltar',   nm:60,  ac:'A320neo',  level:2, tag:'Felsen & Wind',
+      challenge:'Kurzer Sprung mit Fels und Seitenwind-Gefahr. Die Piste kreuzt eine Straße, der Anflug will genau geflogen sein.' },
+    { from:'LPPT', fromCity:'Lissabon', to:'LPMA', toCity:'Funchal',     nm:530, ac:'A320neo',  level:2, tag:'Inselanflug',
+      challenge:'Etwas länger, dafür mit Ansage: Seitenwind, Turbulenzen am Felsen und eine Piste auf Stelzen. Go-Around vorbereiten.' },
+    { from:'EDDH', fromCity:'Hamburg',  to:'EDDW', toCity:'Bremen',      nm:55,  ac:'A220-100', level:1, tag:'Mini-Hop',
+      challenge:'Kaum im Reiseflug, schon wieder im Sinkflug. Ideal für einen schnellen Kaffee zwischendurch.' }
+  ];
+  // Hintergrundbilder: pro Route eine Datei im selben Ordner wie die HTML-Dateien.
+  // Standard-Dateiname: Espresso_<VON>-<NACH>.jpg  (z. B. Espresso_EDDM-LOWI.jpg)
+  // Anderen Namen/Pfad/Format? Im Routen-Objekt  img:'mein-bild.webp'  ergänzen.
+  const IMG_PREFIX = 'Espresso_', IMG_EXT = '.jpg';
+  const bgFor = r => r.img || (IMG_PREFIX + r.from + '-' + r.to + IMG_EXT);
+
+  const LEVEL_NAME = {1:'Ristretto', 2:'Espresso', 3:'Doppio'};
+
+  const listEl = document.getElementById('list');
+  const statsEl = document.getElementById('stats');
+  let sort = 'dist';
+
+  const minutes = nm => Math.round(nm / 7.5 + 14);
+  const beans = n => `<span class="beans" aria-label="Stärke ${n} von 3">${[1,2,3].map(i=>`<span class="bean${i<=n?' on':''}"></span>`).join('')}</span>`;
+  const id = r => r.from + '-' + r.to;
+
+  function sorted(arr){
+    const a = [...arr];
+    const f = { dist:(x,y)=>x.nm-y.nm, distDesc:(x,y)=>y.nm-x.nm, level:(x,y)=>x.level-y.level||x.nm-y.nm, levelDesc:(x,y)=>y.level-x.level||x.nm-y.nm };
+    return a.sort(f[sort]);
+  }
+
+  function render(){
+    const rows = sorted(ROUTES);
+    const avg = rows.length ? Math.round(rows.reduce((s,r)=>s+r.nm,0)/rows.length) : 0;
+    statsEl.innerHTML = `<span><strong>${rows.length}</strong> von ${ROUTES.length} Routen</span><span>Ø Distanz <strong>${avg} NM</strong></span>`;
+    if (!rows.length){ listEl.innerHTML = '<div class="empty"><strong>Keine Routen gefunden</strong></div>'; return; }
+
+    listEl.innerHTML = rows.map(r => `
+      <div class="route" data-id="${id(r)}" tabindex="0" role="button" aria-expanded="false" style="--bg:url('${bgFor(r)}')" >
+        <div class="route-main">
+          <div class="rr-endpoint"><span class="code">${r.from}</span><span class="sub">${r.fromCity}</span></div>
+          <div class="rr-flow">
+            <div class="rr-meta"><span class="rr-dist">${r.nm} NM</span><span>·</span><span>ca. ${minutes(r.nm)} Min.</span></div>
+            <div class="rr-line"></div>
+            <div class="rr-meta">${beans(r.level)}<span>${r.ac}</span></div>
+          </div>
+          <div class="rr-endpoint"><span class="code">${r.to}</span><span class="sub">${r.toCity}</span></div>
+        </div>
+        <div class="route-detail">
+          <div class="detail-title">${LEVEL_NAME[r.level]} · ${r.tag}</div>
+          <p>${r.challenge}</p>
+          <div class="detail-grid">
+            <div><b>${r.nm} NM</b>Distanz</div>
+            <div><b>ca. ${minutes(r.nm)} Min.</b>Flugzeit</div>
+            <div><b>${r.ac}</b>Empfehlung</div>
+          </div>
+          <button type="button" class="btn-sm copy-btn" data-copy="${r.from} → ${r.to} · ${r.nm} NM · ${r.ac}">Route kopieren</button>
+        </div>
+      </div>`).join('');
+  }
+
+  listEl.addEventListener('click', e => {
+    const copy = e.target.closest('.copy-btn');
+    if (copy){
+      e.stopPropagation();
+      const done = () => { copy.textContent = 'Kopiert ✓'; };
+      (navigator.clipboard ? navigator.clipboard.writeText(copy.dataset.copy) : Promise.reject()).then(done, done);
+      return;
+    }
+  });
+
+
+
+  function toggle(card){
+    const open = card.classList.toggle('open');
+    card.setAttribute('aria-expanded', open);
+  }
+  listEl.addEventListener('click', e => {
+    if (e.target.closest('.copy-btn')) return;
+    const card = e.target.closest('.route');
+    if (card) toggle(card);
+  });
+  listEl.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('route')){ e.preventDefault(); toggle(e.target); }
+  });
+
+  render();
+</script>
+</body>
+</html>
