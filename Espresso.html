@@ -52,19 +52,20 @@
     /* Ebenen: 1) heller Overlay für Lesbarkeit  2) eigenes Routenbild (--bg)  3) Fallback BG_Route.png
        Fehlt das eigene Bild, zeigt der Browser automatisch den Fallback. */
     background-image:
-      linear-gradient(rgba(255,255,255,var(--ov-top,.88)), rgba(255,255,255,var(--ov-bottom,.55))),
+      linear-gradient(rgba(255,255,255,var(--ov-top,.100)), rgba(255,255,255,var(--ov-bottom,.100))),
       var(--bg, none),
       url('BG_Route.png');
     background-size:cover; background-position:center; background-repeat:no-repeat;
     transition:box-shadow .15s ease, border-color .15s ease;
     text-align:left; font:inherit; color:inherit; padding:0; width:100%;
+    height: 400px;
   }
   .route:hover, .route.open{ --ov-top:.8; --ov-bottom:.4; border-color:var(--brass-dark); box-shadow:0 10px 24px -18px rgba(23,27,38,.4); }
   .route-main{ display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:1rem; padding:.9rem 1.1rem; }
-  .rr-endpoint{ display:flex; flex-direction:column; align-items:center; min-width:58px; }
+  .rr-endpoint{ background:rgba(255,255,255,.8); border:1px solid var(--line); border-radius:5px; padding:.5rem .7rem; display:flex; flex-direction:column; align-items:center; min-width:58px; }
   .rr-endpoint .code{ font-family:var(--font-display); font-weight:700; font-size:1.2rem; color:var(--ink); }
   .rr-endpoint .sub{ font-size:.68rem; color:var(--text-soft); margin-top:.15rem; }
-  .rr-flow{ display:flex; flex-direction:column; align-items:center; gap:.25rem; min-width:0; }
+  .rr-flow{ background:rgba(255,255,255,.8); border:1px solid var(--line); border-radius:5px; padding:.5rem .7rem; display:flex; flex-direction:column; align-items:center; gap:.25rem; min-width:0; }
   .rr-line{ position:relative; width:100%; height:1px; background:repeating-linear-gradient(90deg,var(--line) 0 6px,transparent 6px 11px); margin:.15rem 0; }
   .rr-line::after{ content:"▸"; position:absolute; right:-2px; top:50%; transform:translateY(-55%); color:var(--brass-dark); font-size:.85rem; }
   .rr-meta{ display:flex; gap:.5rem; align-items:center; font-size:.8rem; color:var(--text-soft); flex-wrap:wrap; justify-content:center; }
@@ -75,16 +76,16 @@
   .rr-right{ display:flex; flex-direction:column; align-items:flex-end; gap:.35rem; text-align:right; min-width:96px; }
   .tag{ font-size:.72rem; color:var(--brass-dark); background:rgba(224,165,54,.14); padding:.2rem .55rem; border-radius:999px; white-space:nowrap; }
 
-  .route-detail{ display:block; padding:0 1.1rem 1.1rem; border-top:1px dashed var(--line); margin-top:-.1rem; }
+  .route-detail{ background:rgba(255,255,255,.8); border:1px solid var(--line); border-radius:5px; padding:.5rem .7rem; display:block; padding:0 1.1rem 1.1rem; border-top:1px dashed var(--line); margin-top:-.1rem; }
     .detail-title{ font-size:.72rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--brass-dark); margin:.9rem 0 .35rem; }
   .route-detail p{ margin:0; font-size:.9rem; color:var(--text-soft); }
   .detail-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; margin-top:.9rem; }
   .detail-grid div{ background:rgba(255,255,255,.8); border:1px solid var(--line); border-radius:5px; padding:.5rem .7rem; font-size:.78rem; color:var(--text-soft); }
-  .detail-grid b{ display:block; color:var(--ink); font-family:var(--font-display); font-size:.92rem; }
-  .copy-btn{ margin-top:.9rem; }
+  .detail-grid b{ display:block; color:var(--ink); font-family:var(--font-display); font-size:.92rem; border-radius: 5px;}
+  .copy-btn{ margin-top:.9rem; border-radius: 5px;}
   /* Weiße Felder + Button erst nach Klick auf die Route */
-  .route .detail-grid, .route .copy-btn{ display:none; }
-  .route.open .detail-grid{ display:grid; animation:pop .25s ease both; }
+  .route .route-detail, .detail-grid, .route .copy-btn{ display:none; }
+  .route.open .route-detail, .detail-grid{ display:grid; animation:pop .25s ease both; }
   .route.open .copy-btn{ display:inline-flex; animation:pop .25s ease both; }
 
   .empty{ padding:3rem 1rem; text-align:center; color:var(--text-soft); grid-column:1/-1; }
@@ -208,9 +209,9 @@
 
   function render(){
     const rows = sorted(ROUTES);
-    const avg = rows.length ? Math.round(rows.reduce((s,r)=>s+r.nm,0)/rows.length) : 0;
+    /*const avg = rows.length ? Math.round(rows.reduce((s,r)=>s+r.nm,0)/rows.length) : 0;
     statsEl.innerHTML = `<span><strong>${rows.length}</strong> von ${ROUTES.length} Routen</span><span>Ø Distanz <strong>${avg} NM</strong></span>`;
-    if (!rows.length){ listEl.innerHTML = '<div class="empty"><strong>Keine Routen gefunden</strong></div>'; return; }
+    if (!rows.length){ listEl.innerHTML = '<div class="empty"><strong>Keine Routen gefunden</strong></div>'; return; }*/
 
     listEl.innerHTML = rows.map(r => `
       <div class="route" data-id="${id(r)}" tabindex="0" role="button" aria-expanded="false" style="--bg:url('${bgFor(r)}')" >
